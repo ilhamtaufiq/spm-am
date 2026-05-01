@@ -238,21 +238,29 @@
 
 <body>
     <div class="container">
-        <div style="background: var(--white); border: var(--border-width) solid var(--black); border-radius: var(--radius); padding: 3rem; margin-bottom: 3rem; box-shadow: var(--shadow); display: flex; align-items: center; gap: 3rem; position: relative; overflow: hidden; animation: fadeIn 0.8s ease-out;">
+        <div
+            style="background: var(--white); border: var(--border-width) solid var(--black); border-radius: var(--radius); padding: 3rem; margin-bottom: 3rem; box-shadow: var(--shadow); display: flex; align-items: center; gap: 3rem; position: relative; overflow: hidden; animation: fadeIn 0.8s ease-out;">
             <div style="flex: 1; z-index: 2;">
                 <div style="display: flex; gap: 0.5rem; margin-bottom: 1rem;">
                     <span class="status-badge status-high" style="border: 2px solid #000;">LIVE DATA</span>
-                    <span class="status-badge" style="background: #e0f2fe; color: #0369a1; border: 2px solid #000;">v2.0 PRO</span>
+                    <span class="status-badge" style="background: #e0f2fe; color: #0369a1; border: 2px solid #000;">v2.0
+                        PRO</span>
                 </div>
-                <h1 style="font-size: 4.5rem; margin-bottom: 0.5rem; line-height: 0.85; color: var(--text);">SPM<br>SUPER APP</h1>
-                <p class="subtitle" style="font-size: 1.4rem; color: var(--text); margin-bottom: 2rem; font-weight: 600; opacity: 0.8;">Monitoring Capaian Akses Air Minum <br>Kabupaten Sukabumi</p>
+                <h1 style="font-size: 4.5rem; margin-bottom: 0.5rem; line-height: 0.85; color: var(--text);">
+                    SPM<br>SUPER APP</h1>
+                <p class="subtitle"
+                    style="font-size: 1.4rem; color: var(--text); margin-bottom: 2rem; font-weight: 600; opacity: 0.8;">
+                    Monitoring Capaian Akses Air Minum <br>Kabupaten Cianjur</p>
                 <div style="display: flex; gap: 1.5rem;">
-                    <button class="btn btn-primary" onclick="openAddModal()" style="font-size: 1.1rem; padding: 1.2rem 2.5rem;">+ TAMBAH DATA</button>
-                    <button class="btn" style="background: #ffffff; font-size: 1.1rem;" onclick="toggleTheme()">THEME</button>
+                    <button class="btn btn-primary" onclick="openAddModal()"
+                        style="font-size: 1.1rem; padding: 1.2rem 2.5rem;">+ TAMBAH DATA</button>
+                    <button class="btn" style="background: #ffffff; font-size: 1.1rem;"
+                        onclick="toggleTheme()">THEME</button>
                 </div>
             </div>
             <div style="flex: 0 0 450px; position: relative; z-index: 1;">
-                <img src="/static/hero.png" alt="Hero" class="hero-img" style="width: 130%; height: auto; transform: rotate(5deg) translateX(40px);">
+                <img src="/static/hero.png" alt="Hero" class="hero-img"
+                    style="width: 130%; height: auto; transform: rotate(5deg) translateX(40px);">
             </div>
         </div>
 
@@ -265,35 +273,45 @@
             <div class="stat-card">
                 <div style="display: flex; justify-content: space-between; align-items: flex-start;">
                     <span class="label">Total SR</span>
-                    <div style="width: 50px; height: 50px; background: rgba(0,0,0,0.05); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">🏠</div>
+                    <div
+                        style="width: 50px; height: 50px; background: rgba(0,0,0,0.05); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">
+                        🏠</div>
                 </div>
                 <span class="value">{{ "{:,}".format(total_sr) }}</span>
             </div>
             <div class="stat-card">
                 <div style="display: flex; justify-content: space-between; align-items: flex-start;">
                     <span class="label">Total KK (JP)</span>
-                    <div style="width: 50px; height: 50px; background: rgba(0,0,0,0.05); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">👨‍👩‍👧</div>
+                    <div
+                        style="width: 50px; height: 50px; background: rgba(0,0,0,0.05); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">
+                        👨‍👩‍👧</div>
                 </div>
                 <span class="value">{{ "{:,}".format(total_kk) }}</span>
             </div>
             <div class="stat-card" style="background: #fcd34d;">
                 <div style="display: flex; justify-content: space-between; align-items: flex-start;">
                     <span class="label">Total Jiwa</span>
-                    <div style="width: 50px; height: 50px; background: rgba(0,0,0,0.05); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">👥</div>
+                    <div
+                        style="width: 50px; height: 50px; background: rgba(0,0,0,0.05); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">
+                        👥</div>
                 </div>
                 <span class="value">{{ "{:,}".format(total_kk * 5) }}</span>
             </div>
             <div class="stat-card" style="background: #60a5fa;">
                 <div style="display: flex; justify-content: space-between; align-items: flex-start;">
                     <span class="label">Total KK (BJP)</span>
-                    <div style="width: 50px; height: 50px; background: rgba(0,0,0,0.05); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">💧</div>
+                    <div
+                        style="width: 50px; height: 50px; background: rgba(0,0,0,0.05); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">
+                        💧</div>
                 </div>
                 <span class="value">{{ "{:,}".format(total_bjp_kk) }}</span>
             </div>
             <div class="stat-card" style="background: #d8b4fe;">
                 <div style="display: flex; justify-content: space-between; align-items: flex-start;">
                     <span class="label">Capaian Akhir</span>
-                    <div style="width: 50px; height: 50px; background: rgba(0,0,0,0.05); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">🎯</div>
+                    <div
+                        style="width: 50px; height: 50px; background: rgba(0,0,0,0.05); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">
+                        🎯</div>
                 </div>
                 <span class="value">{{ "%.2f"|format(total_combined_percentage) }}%</span>
             </div>
@@ -416,7 +434,8 @@
                     <label>Jumlah KK (JP)</label>
                     <input type="number" name="jumlah_kk" value="0" required min="0">
                 </div>
-                <div class="form-group" style="background: #f0f9ff; padding: 10px; border-radius: 8px; border: 1px solid #7dd3fc;">
+                <div class="form-group"
+                    style="background: #f0f9ff; padding: 10px; border-radius: 8px; border: 1px solid #7dd3fc;">
                     <label style="color: #0369a1; font-weight: 600;">Jumlah KK (BJP)</label>
                     <input type="number" name="jumlah_bjp_kk" value="0" min="0" style="border-color: #7dd3fc;">
                 </div>
@@ -433,7 +452,8 @@
         <div class="modal">
             <h2 id="modalTitle" style="margin-bottom: 1.5rem;">Update Data</h2>
             <form id="updateForm" method="POST">
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; border-bottom: 2px solid var(--black); padding-bottom: 1rem; margin-bottom: 1rem;">
+                <div
+                    style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; border-bottom: 2px solid var(--black); padding-bottom: 1rem; margin-bottom: 1rem;">
                     <div class="form-group">
                         <label>Jumlah SR (Unit)</label>
                         <input type="number" name="jumlah_sr" id="inputSR" required>
@@ -444,13 +464,16 @@
                     </div>
                 </div>
 
-                <div class="form-group" style="background: #f0f9ff; padding: 10px; border-radius: 15px; border: 2px solid #000; margin-bottom: 1.5rem;">
+                <div class="form-group"
+                    style="background: #f0f9ff; padding: 10px; border-radius: 15px; border: 2px solid #000; margin-bottom: 1.5rem;">
                     <label style="color: #0369a1; font-weight: 800;">Jumlah KK (BJP / Bukan Pipa)</label>
                     <input type="number" name="jumlah_bjp_kk" id="inputBJPKK" required>
                 </div>
 
                 <!-- KELEMBAGAAN POKMAS -->
-                <h3 style="font-size: 0.9rem; margin-bottom: 1rem; background: var(--accent); display: inline-block; padding: 2px 8px; border: 2px solid #000; border-radius: 5px;">KELEMBAGAAN POKMAS</h3>
+                <h3
+                    style="font-size: 0.9rem; margin-bottom: 1rem; background: var(--accent); display: inline-block; padding: 2px 8px; border: 2px solid #000; border-radius: 5px;">
+                    KELEMBAGAAN POKMAS</h3>
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
                     <div class="form-group">
                         <label>Nama POKMAS</label>
@@ -477,7 +500,9 @@
                 </div>
 
                 <!-- DATA TEKNIS -->
-                <h3 style="font-size: 0.9rem; margin-bottom: 1rem; background: #9edb54; display: inline-block; padding: 2px 8px; border: 2px solid #000; border-radius: 5px;">DATA TEKNIS</h3>
+                <h3
+                    style="font-size: 0.9rem; margin-bottom: 1rem; background: #9edb54; display: inline-block; padding: 2px 8px; border: 2px solid #000; border-radius: 5px;">
+                    DATA TEKNIS</h3>
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
                     <div class="form-group">
                         <label>Sistem (Gravitasi/Pompa)</label>
@@ -500,7 +525,9 @@
                 </div>
 
                 <!-- KEUANGAN -->
-                <h3 style="font-size: 0.9rem; margin-bottom: 1rem; background: #fcd34d; display: inline-block; padding: 2px 8px; border: 2px solid #000; border-radius: 5px;">KEUANGAN & LEGALITAS</h3>
+                <h3
+                    style="font-size: 0.9rem; margin-bottom: 1rem; background: #fcd34d; display: inline-block; padding: 2px 8px; border: 2px solid #000; border-radius: 5px;">
+                    KEUANGAN & LEGALITAS</h3>
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
                     <div class="form-group">
                         <label>Dasar Hukum Tarif</label>
@@ -530,7 +557,7 @@
                     <label>Jumlah Jiwa (JP)</label>
                     <input type="number" name="jumlah_jiwa" id="inputJiwa">
                 </div>
-                
+
                 <div style="display: flex; gap: 1rem; justify-content: flex-end; margin-top: 2rem;">
                     <button type="button" class="btn" style="background: #f1f5f9; box-shadow: 4px 4px 0px 0px #000;"
                         onclick="closeModal('editModal')">CANCEL</button>
@@ -776,7 +803,7 @@
             // Find data from global allItems
             let foundData = null;
             let foundYear = null;
-            
+
             for (let item of allItems) {
                 foundYear = item.years_list.find(y => y.id == id);
                 if (foundYear) {
@@ -798,7 +825,7 @@
             document.getElementById('inputKK').value = foundYear.kk;
             document.getElementById('inputJiwa').value = foundYear.jiwa;
             document.getElementById('inputBJPKK').value = foundYear.bjp_kk || 0;
-            
+
             // Meta fields
             document.getElementById('inputSistem').value = meta.sistem_layanan || '';
             document.getElementById('inputKepala').value = meta.kepala || '';
@@ -806,7 +833,7 @@
             document.getElementById('inputOps').value = meta.biaya_operasional || '';
             document.getElementById('inputDana').value = meta.sumber_dana || '';
             document.getElementById('inputProgram').value = meta.program || '';
-            
+
             // New SIMSPAM fields
             document.getElementById('inputPokmas').value = meta.pokmas || '';
             document.getElementById('inputPerdes').value = meta.perdes || '';
