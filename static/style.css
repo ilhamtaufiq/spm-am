@@ -200,7 +200,66 @@ tr:hover td {
 .status-med { background: #fde047; }
 .status-high { background: #86efac; }
 
-@media (max-width: 768px) {
-    h1 { font-size: 2.5rem; }
-    .card { padding: 1.5rem; }
+/* Modals */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.8);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    backdrop-filter: blur(5px);
+}
+
+.modal {
+    background: var(--bg);
+    border: var(--border-width) solid var(--black);
+    border-radius: var(--radius);
+    padding: 3rem;
+    width: 90%;
+    max-width: 500px;
+    box-shadow: 10px 10px 0px 0px var(--black);
+    position: relative;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+
+.modal h2 {
+    font-weight: 900;
+    text-transform: uppercase;
+}
+
+.close {
+    font-size: 2rem;
+    font-weight: 900;
+    cursor: pointer;
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-group label {
+    display: block;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 1rem;
+    border: var(--border-width) solid var(--black);
+    border-radius: 15px;
+    font-weight: 600;
 }
