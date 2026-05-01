@@ -115,7 +115,13 @@ async def read_root(request: Request, db: Session = Depends(get_db)):
             "meta": {
                 "sumber_dana": item.sumber_dana, "program": item.program,
                 "sistem_layanan": item.sistem_layanan, "kepala": item.kepala,
-                "iuran_nominal": item.iuran_nominal, "biaya_operasional": item.biaya_operasional
+                "iuran_nominal": item.iuran_nominal, "biaya_operasional": item.biaya_operasional,
+                "pokmas": item.pokmas, "perdes": item.perdes,
+                "bendahara": item.bendahara, "sekretaris": item.sekretaris,
+                "sumber_mata_air_kap": item.sumber_mata_air_kap,
+                "sumber_air_tanah_kap": item.sumber_air_tanah_kap,
+                "lain_lain_kap": item.lain_lain_kap,
+                "tarif_dasar_hukum": item.tarif_dasar_hukum
             }
         })
         
@@ -164,12 +170,20 @@ async def add_data(
     jumlah_sr: int = Form(...), 
     jumlah_kk: int = Form(...), 
     jumlah_bjp_kk: int = Form(0),
-    sumber_dana: str = Form("Manual"),
-    program: str = Form("Manual"),
-    sistem_layanan: str = Form(None),
+    pokmas: str = Form(None),
+    perdes: str = Form(None),
     kepala: str = Form(None),
+    bendahara: str = Form(None),
+    sekretaris: str = Form(None),
+    sumber_mata_air_kap: str = Form(None),
+    sistem_layanan: str = Form(None),
+    sumber_air_tanah_kap: str = Form(None),
+    lain_lain_kap: str = Form(None),
+    tarif_dasar_hukum: str = Form(None),
     iuran_nominal: str = Form(None),
     biaya_operasional: str = Form(None),
+    sumber_dana: str = Form("Manual"),
+    program: str = Form("Manual"),
     db: Session = Depends(get_db)
 ):
     if not get_current_user(request): return RedirectResponse(url="/login", status_code=302)
@@ -179,9 +193,13 @@ async def add_data(
         kecamatan=kecamatan, desa=desa, tahun=tahun, 
         jumlah_sr=jumlah_sr, jumlah_kk=jumlah_kk, jumlah_jiwa=jumlah_kk*5, 
         jumlah_bjp_kk=jumlah_bjp_kk, jumlah_bjp_jiwa=jumlah_bjp_kk*5,
-        target=target, sumber_dana=sumber_dana, program=program,
-        sistem_layanan=sistem_layanan, kepala=kepala,
-        iuran_nominal=iuran_nominal, biaya_operasional=biaya_operasional
+        target=target, pokmas=pokmas, perdes=perdes, kepala=kepala,
+        bendahara=bendahara, sekretaris=sekretaris,
+        sumber_mata_air_kap=sumber_mata_air_kap, sistem_layanan=sistem_layanan,
+        sumber_air_tanah_kap=sumber_air_tanah_kap, lain_lain_kap=lain_lain_kap,
+        tarif_dasar_hukum=tarif_dasar_hukum, iuran_nominal=iuran_nominal,
+        biaya_operasional=biaya_operasional, sumber_dana=sumber_dana,
+        program=program
     )
     db.add(new_item)
     db.commit()
@@ -194,8 +212,16 @@ async def update_item(
     jumlah_sr: int = Form(...), 
     jumlah_kk: int = Form(...), 
     jumlah_bjp_kk: int = Form(0), 
-    sistem_layanan: str = Form(None),
+    pokmas: str = Form(None),
+    perdes: str = Form(None),
     kepala: str = Form(None),
+    bendahara: str = Form(None),
+    sekretaris: str = Form(None),
+    sumber_mata_air_kap: str = Form(None),
+    sistem_layanan: str = Form(None),
+    sumber_air_tanah_kap: str = Form(None),
+    lain_lain_kap: str = Form(None),
+    tarif_dasar_hukum: str = Form(None),
     iuran_nominal: str = Form(None),
     biaya_operasional: str = Form(None),
     sumber_dana: str = Form(None),
@@ -210,8 +236,16 @@ async def update_item(
         item.jumlah_jiwa = jumlah_kk * 5
         item.jumlah_bjp_kk = jumlah_bjp_kk
         item.jumlah_bjp_jiwa = jumlah_bjp_kk * 5
-        item.sistem_layanan = sistem_layanan
+        item.pokmas = pokmas
+        item.perdes = perdes
         item.kepala = kepala
+        item.bendahara = bendahara
+        item.sekretaris = sekretaris
+        item.sumber_mata_air_kap = sumber_mata_air_kap
+        item.sistem_layanan = sistem_layanan
+        item.sumber_air_tanah_kap = sumber_air_tanah_kap
+        item.lain_lain_kap = lain_lain_kap
+        item.tarif_dasar_hukum = tarif_dasar_hukum
         item.iuran_nominal = iuran_nominal
         item.biaya_operasional = biaya_operasional
         item.sumber_dana = sumber_dana

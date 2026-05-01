@@ -420,63 +420,108 @@
         <div class="modal">
             <h2 id="modalTitle" style="margin-bottom: 1.5rem;">Update Data</h2>
             <form id="updateForm" method="POST">
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; border-bottom: 2px solid var(--black); padding-bottom: 1rem; margin-bottom: 1rem;">
                     <div class="form-group">
                         <label>Jumlah SR (Unit)</label>
-                        <input type="number" step="1" name="jumlah_sr" id="inputSR" required>
+                        <input type="number" name="jumlah_sr" id="inputSR" required>
                     </div>
                     <div class="form-group">
                         <label>Jumlah KK (JP)</label>
-                        <input type="number" step="1" name="jumlah_kk" id="inputKK" required>
+                        <input type="number" name="jumlah_kk" id="inputKK" required>
                     </div>
                 </div>
-                
-                <div class="form-group" style="background: #f0f9ff; padding: 10px; border-radius: 8px; border: 1px solid #7dd3fc;">
-                    <label style="color: #0369a1; font-weight: 600;">Jumlah KK (BJP)</label>
-                    <input type="number" step="1" name="jumlah_bjp_kk" id="inputBJPKK" required>
+
+                <div class="form-group" style="background: #f0f9ff; padding: 10px; border-radius: 15px; border: 2px solid #000; margin-bottom: 1.5rem;">
+                    <label style="color: #0369a1; font-weight: 800;">Jumlah KK (BJP / Bukan Pipa)</label>
+                    <input type="number" name="jumlah_bjp_kk" id="inputBJPKK" required>
                 </div>
 
+                <!-- KELEMBAGAAN POKMAS -->
+                <h3 style="font-size: 0.9rem; margin-bottom: 1rem; background: var(--accent); display: inline-block; padding: 2px 8px; border: 2px solid #000; border-radius: 5px;">KELEMBAGAAN POKMAS</h3>
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
                     <div class="form-group">
-                        <label>Sistem Layanan</label>
+                        <label>Nama POKMAS</label>
+                        <input type="text" name="pokmas" id="inputPokmas">
+                    </div>
+                    <div class="form-group">
+                        <label>Perdes Pembentukan</label>
+                        <input type="text" name="perdes" id="inputPerdes">
+                    </div>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.5rem;">
+                    <div class="form-group">
+                        <label>Kepala</label>
+                        <input type="text" name="kepala" id="inputKepala">
+                    </div>
+                    <div class="form-group">
+                        <label>Bendahara</label>
+                        <input type="text" name="bendahara" id="inputBendahara">
+                    </div>
+                    <div class="form-group">
+                        <label>Sekretaris</label>
+                        <input type="text" name="sekretaris" id="inputSekretaris">
+                    </div>
+                </div>
+
+                <!-- DATA TEKNIS -->
+                <h3 style="font-size: 0.9rem; margin-bottom: 1rem; background: #9edb54; display: inline-block; padding: 2px 8px; border: 2px solid #000; border-radius: 5px;">DATA TEKNIS</h3>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                    <div class="form-group">
+                        <label>Sistem (Gravitasi/Pompa)</label>
                         <input type="text" name="sistem_layanan" id="inputSistem">
                     </div>
                     <div class="form-group">
-                        <label>Pengelola (Kepala)</label>
-                        <input type="text" name="kepala" id="inputKepala">
+                        <label>Sumber Mata Air (L/det)</label>
+                        <input type="text" name="sumber_mata_air_kap" id="inputMataAir">
+                    </div>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                    <div class="form-group">
+                        <label>Air Tanah (L/det)</label>
+                        <input type="text" name="sumber_air_tanah_kap" id="inputAirTanah">
+                    </div>
+                    <div class="form-group">
+                        <label>Lain-lain (L/det)</label>
+                        <input type="text" name="lain_lain_kap" id="inputLain">
                     </div>
                 </div>
 
+                <!-- KEUANGAN -->
+                <h3 style="font-size: 0.9rem; margin-bottom: 1rem; background: #fcd34d; display: inline-block; padding: 2px 8px; border: 2px solid #000; border-radius: 5px;">KEUANGAN & LEGALITAS</h3>
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
                     <div class="form-group">
-                        <label>Iuran Nominal</label>
+                        <label>Dasar Hukum Tarif</label>
+                        <input type="text" name="tarif_dasar_hukum" id="inputHukum">
+                    </div>
+                    <div class="form-group">
+                        <label>Besaran Iuran (Rp)</label>
                         <input type="text" name="iuran_nominal" id="inputIuran">
                     </div>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
                     <div class="form-group">
-                        <label>Biaya Ops</label>
+                        <label>Biaya Ops / Bulan</label>
                         <input type="text" name="biaya_operasional" id="inputOps">
                     </div>
-                </div>
-
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
                     <div class="form-group">
                         <label>Sumber Dana</label>
                         <input type="text" name="sumber_dana" id="inputDana">
                     </div>
-                    <div class="form-group">
-                        <label>Program</label>
-                        <input type="text" name="program" id="inputProgram">
-                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Program Pembangunan</label>
+                    <input type="text" name="program" id="inputProgram">
                 </div>
 
                 <div class="form-group" style="display:none;">
                     <label>Jumlah Jiwa (JP)</label>
-                    <input type="number" step="1" name="jumlah_jiwa" id="inputJiwa">
+                    <input type="number" name="jumlah_jiwa" id="inputJiwa">
                 </div>
-                <div style="display: flex; gap: 1rem; justify-content: flex-end; margin-top: 1rem;">
+                
+                <div style="display: flex; gap: 1rem; justify-content: flex-end; margin-top: 2rem;">
                     <button type="button" class="btn" style="background: #f1f5f9; box-shadow: 4px 4px 0px 0px #000;"
-                        onclick="closeModal('editModal')">Cancel</button>
-                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                        onclick="closeModal('editModal')">CANCEL</button>
+                    <button type="submit" class="btn btn-primary">SAVE DATA SIMSPAM</button>
                 </div>
             </form>
         </div>
@@ -679,7 +724,7 @@
                         <td style="font-size: 0.7rem;">${y.meta.kepala || '-'}</td>
                         <td>
                             <button class="btn btn-primary" style="padding: 4px 8px; font-size: 0.7rem;" 
-                                onclick="openEdit('${y.id}', '${item.desa} (${y.tahun})', '${y.sr}', '${y.kk}', '${y.jiwa}', '${y.bjp_kk || 0}', '${y.meta.sistem_layanan || ''}', '${y.meta.kepala || ''}', '${y.meta.iuran_nominal || ''}', '${y.meta.biaya_operasional || ''}', '${y.meta.sumber_dana || ''}', '${y.meta.program || ''}')">Edit</button>
+                                onclick="openEdit('${y.id}', '${item.desa} (${y.tahun})', '${y.sr}', '${y.kk}', '${y.jiwa}', '${y.bjp_kk || 0}', ${JSON.stringify(y.meta)})">Edit</button>
                         </td>
                     </tr>
                 `;
@@ -714,19 +759,32 @@
             }
         }
 
-        function openEdit(id, desa, sr, kk, jiwa, bjp_kk, sistem, kepala, iuran, ops, dana, program) {
+        function openEdit(id, desa, sr, kk, jiwa, bjp_kk, meta) {
             document.getElementById('modalTitle').innerText = 'Update ' + desa;
             document.getElementById('updateForm').action = '/update/' + id;
             document.getElementById('inputSR').value = sr;
             document.getElementById('inputKK').value = kk;
             document.getElementById('inputJiwa').value = jiwa;
             document.getElementById('inputBJPKK').value = bjp_kk || 0;
-            document.getElementById('inputSistem').value = sistem || '';
-            document.getElementById('inputKepala').value = kepala || '';
-            document.getElementById('inputIuran').value = iuran || '';
-            document.getElementById('inputOps').value = ops || '';
-            document.getElementById('inputDana').value = dana || '';
-            document.getElementById('inputProgram').value = program || '';
+            
+            // Meta fields
+            document.getElementById('inputSistem').value = meta.sistem_layanan || '';
+            document.getElementById('inputKepala').value = meta.kepala || '';
+            document.getElementById('inputIuran').value = meta.iuran_nominal || '';
+            document.getElementById('inputOps').value = meta.biaya_operasional || '';
+            document.getElementById('inputDana').value = meta.sumber_dana || '';
+            document.getElementById('inputProgram').value = meta.program || '';
+            
+            // New SIMSPAM fields
+            document.getElementById('inputPokmas').value = meta.pokmas || '';
+            document.getElementById('inputPerdes').value = meta.perdes || '';
+            document.getElementById('inputBendahara').value = meta.bendahara || '';
+            document.getElementById('inputSekretaris').value = meta.sekretaris || '';
+            document.getElementById('inputMataAir').value = meta.sumber_mata_air_kap || '';
+            document.getElementById('inputAirTanah').value = meta.sumber_air_tanah_kap || '';
+            document.getElementById('inputLain').value = meta.lain_lain_kap || '';
+            document.getElementById('inputHukum').value = meta.tarif_dasar_hukum || '';
+
             document.getElementById('editModal').style.display = 'flex';
         }
 
