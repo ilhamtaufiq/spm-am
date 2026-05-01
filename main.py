@@ -129,17 +129,19 @@ async def analyze_rab_post(request: Request, files: List[UploadFile] = File(...)
         results = extract_rab.extract_rab(BytesIO(content))
         if results:
             all_results.extend(results)
-            # Beri jarak baris kosong antar file biar rapi
-            all_results.append({
-                "item": "", "satuan": "", "volume": None, "harga": None, "pajak": "", "keterangan": "", "kunci": ""
-            })
+            all_results.append({"item": "", "satuan": "", "volume": None, "harga": None, "pajak": "", "keterangan": "", "kunci": ""})
             
     if not all_results: 
-        return {"status": "error", "message": "Gagal ekstrak data dari semua file. Pastikan sheet bernama 'RAB'."}
+        return {"status": "error", "message": "Gagal ekstrak data."}
         
-    output_buffer = extract_rab.create_xlsx_buffer(all_results)
-    filename = "Analisa_Multi_RAB.xlsx"
-    return StreamingResponse(output_buffer, media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", headers={"Content-Disposition": f"attachment; filename={filename}"})
+    return {"status": "success", "data": all_results, "count": len(all_results)}
+
+@app.post("/rab/download")
+async def download_rab(request: Request):
+    if not get_current_user(request): return RedirectResponse(url="/login")
+    data = await request.json()
+    output_buffer = extract_rab.create_xlsx_buffer(data)
+    return StreamingResponse(output_buffer, media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", headers={"Content-Disposition": "attachment; filename=Analisa_Multi_RAB.xlsx"})
 
 # REMI COUNTER ROUTES
 @app.get("/remi", response_class=HTMLResponse)

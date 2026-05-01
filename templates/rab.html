@@ -25,16 +25,38 @@
 
         <div class="card" style="background: var(--accent); margin-bottom: 3rem;">
             <h2 style="margin-bottom: 1.5rem; font-weight: 900;">UPLOAD FILE RAB</h2>
-            <p style="margin-bottom: 2rem; font-weight: 600;">Silakan upload file Excel RAB (MCK) untuk diekstrak item
-                pekerjaannya secara otomatis.</p>
+            <p style="margin-bottom: 2rem; font-weight: 600;">Silakan upload banyak file Excel RAB (MCK) sekaligus untuk diekstrak item pekerjaannya.</p>
 
-            <form action="/rab/analyze" method="post" enctype="multipart/form-data"
-                style="display: flex; flex-direction: column; gap: 1.5rem;">
+            <div style="display: flex; flex-direction: column; gap: 1.5rem;">
                 <div class="form-group">
-                    <input type="file" name="files" accept=".xlsx" class="form-input" style="background: white;" multiple required>
+                    <input type="file" id="fileInput" name="files" accept=".xlsx" class="form-input" style="background: white;" multiple required>
                 </div>
-                <button type="submit" class="btn btn-primary" style="background: var(--main); width: fit-content;">MULAI ANALISA MULTI-FILE</button>
-            </form>
+                <button type="button" id="analyzeBtn" class="btn btn-primary" style="background: var(--main); width: fit-content;" onclick="analyzeFiles()">MULAI ANALISA MULTI-FILE</button>
+            </div>
+        </div>
+
+        <div id="resultsSection" class="card" style="display: none; margin-bottom: 3rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;">
+                <h2 style="font-weight: 900;">HASIL EKSTRAKSI (<span id="itemCount">0</span> ITEM)</h2>
+                <button class="btn" style="background: #10b981; color: white;" onclick="downloadXlsx()">DOWNLOAD XLSX</button>
+            </div>
+            
+            <div style="overflow-x: auto; border: 3px solid #000; border-radius: 8px;">
+                <table style="width: 100%; border-collapse: collapse; background: white;">
+                    <thead>
+                        <tr style="background: #000; color: #fff;">
+                            <th style="padding: 1rem; text-align: left; border-right: 2px solid #fff;">ITEM PEKERJAAN</th>
+                            <th style="padding: 1rem; text-align: left; border-right: 2px solid #fff;">SATUAN</th>
+                            <th style="padding: 1rem; text-align: left; border-right: 2px solid #fff;">VOLUME</th>
+                            <th style="padding: 1rem; text-align: left; border-right: 2px solid #fff;">HARGA</th>
+                            <th style="padding: 1rem; text-align: left;">KUNCI</th>
+                        </tr>
+                    </thead>
+                    <tbody id="resultsTableBody">
+                        <!-- Data akan muncul di sini via JS -->
+                    </tbody>
+                </table>
+            </div>
         </div>
 
         <div class="card">
@@ -48,6 +70,96 @@
             </ul>
         </div>
     </div>
+    <script>
+        let extractedData = null;
+
+        async function analyzeFiles() {
+            const fileInput = document.getElementById('fileInput');
+            const btn = document.getElementById('analyzeBtn');
+            if (fileInput.files.length === 0) {
+                alert("Pilih file dulu, Bos!");
+                return;
+            }
+
+            const formData = new FormData();
+            for (let file of fileInput.files) {
+                formData.append('files', file);
+            }
+
+            btn.disabled = true;
+            btn.textContent = "MEMPROSES...";
+
+            try {
+                const response = await fetch('/rab/analyze', {
+                    method: 'POST',
+                    body: formData
+                });
+                const result = await response.json();
+
+                if (result.status === 'success') {
+                    extractedData = result.data;
+                    displayResults(result);
+                } else {
+                    alert("Gagal: " + result.message);
+                }
+            } catch (error) {
+                alert("Error saat menghubungi server");
+                console.error(error);
+            } finally {
+                btn.disabled = false;
+                btn.textContent = "MULAI ANALISA MULTI-FILE";
+            }
+        }
+
+        function displayResults(result) {
+            const section = document.getElementById('resultsSection');
+            const tbody = document.getElementById('resultsTableBody');
+            const countSpan = document.getElementById('itemCount');
+            
+            tbody.innerHTML = '';
+            result.data.forEach(item => {
+                const isTitle = !item.volume && !item.harga && item.item !== "";
+                const bg = isTitle ? "#f1f5f9" : "transparent";
+                const fontWeight = isTitle ? "900" : "400";
+
+                const row = `<tr style="background: ${bg}; border-bottom: 2px solid #000;">
+                    <td style="padding: 1rem; border-right: 2px solid #000; font-weight: ${fontWeight};">${item.item}</td>
+                    <td style="padding: 1rem; border-right: 2px solid #000;">${item.satuan || '-'}</td>
+                    <td style="padding: 1rem; border-right: 2px solid #000;">${item.volume || '-'}</td>
+                    <td style="padding: 1rem; border-right: 2px solid #000;">${item.harga ? 'Rp ' + item.harga.toLocaleString('id-ID') : '-'}</td>
+                    <td style="padding: 1rem; font-weight: 900; color: ${item.kunci === 'TRUE' ? '#ef4444' : '#10b981'};">${item.kunci || '-'}</td>
+                </tr>`;
+                tbody.innerHTML += row;
+            });
+            
+            countSpan.textContent = result.count;
+            section.style.display = 'block';
+            section.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        async function downloadXlsx() {
+            if (!extractedData) return;
+            
+            try {
+                const response = await fetch('/rab/download', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(extractedData)
+                });
+                
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = "Analisa_Multi_RAB.xlsx";
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
+            } catch (error) {
+                alert("Gagal download file");
+            }
+        }
+    </script>
 </body>
 
 </html>
