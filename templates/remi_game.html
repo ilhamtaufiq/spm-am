@@ -25,9 +25,15 @@
         }
         .round-form-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-            gap: 1rem;
-            margin-top: 1.5rem;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+        .round-input-group {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 1.5rem;
+            border: 3px solid #000;
+            border-radius: 20px;
         }
     </style>
 </head>
@@ -64,13 +70,13 @@
             <form action="/remi/{{ game.id }}/round" method="post">
                 <div class="round-form-grid">
                     {% for player in players %}
-                    <div class="form-group">
-                        <label style="color: white; font-weight: 900; display: block; margin-bottom: 0.5rem; text-transform: uppercase;">{{ player.name }}</label>
-                        <input type="number" name="p_{{ player.id }}" placeholder="0" class="form-input" style="background: white; text-align: center; font-weight: 900; font-size: 1.5rem;">
+                    <div class="round-input-group">
+                        <label style="color: white; font-weight: 900; display: block; margin-bottom: 0.8rem; text-transform: uppercase; font-size: 1.2rem;">{{ player.name }}</label>
+                        <input type="number" name="p_{{ player.id }}" placeholder="0" class="form-input" style="background: white; text-align: center; font-weight: 900; font-size: 2rem; width: 100%;">
                     </div>
                     {% endfor %}
                 </div>
-                <button type="submit" class="btn btn-primary" style="margin-top: 2rem; width: 100%; font-size: 1.5rem; background: black;">SIMPAN PUTARAN SEKARANG</button>
+                <button type="submit" class="btn btn-primary" style="margin-top: 3rem; width: 100%; font-size: 1.8rem; background: black; padding: 1.5rem;">SIMPAN PUTARAN SEKARANG</button>
             </form>
         </div>
         {% endif %}
