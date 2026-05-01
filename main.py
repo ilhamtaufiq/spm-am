@@ -1,3 +1,4 @@
+from typing import List
 from fastapi import FastAPI, Request, Depends, Form, HTTPException, status, File, UploadFile
 from fastapi.responses import HTMLResponse, RedirectResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
@@ -119,13 +120,25 @@ async def rab_page(request: Request):
     return templates.TemplateResponse(request=request, name="rab.html")
 
 @app.post("/rab/analyze")
-async def analyze_rab_post(request: Request, file: UploadFile = File(...)):
+async def analyze_rab_post(request: Request, files: List[UploadFile] = File(...)):
     if not get_current_user(request): return RedirectResponse(url="/login")
-    content = await file.read()
-    results = extract_rab.extract_rab(BytesIO(content))
-    if not results: return {"status": "error", "message": "Gagal ekstrak data. Pastikan sheet bernama 'RAB'."}
-    output_buffer = extract_rab.create_xlsx_buffer(results)
-    filename = f"Analisa_RAB_{file.filename}"
+    
+    all_results = []
+    for file in files:
+        content = await file.read()
+        results = extract_rab.extract_rab(BytesIO(content))
+        if results:
+            all_results.extend(results)
+            # Beri jarak baris kosong antar file biar rapi
+            all_results.append({
+                "item": "", "satuan": "", "volume": None, "harga": None, "pajak": "", "keterangan": "", "kunci": ""
+            })
+            
+    if not all_results: 
+        return {"status": "error", "message": "Gagal ekstrak data dari semua file. Pastikan sheet bernama 'RAB'."}
+        
+    output_buffer = extract_rab.create_xlsx_buffer(all_results)
+    filename = "Analisa_Multi_RAB.xlsx"
     return StreamingResponse(output_buffer, media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", headers={"Content-Disposition": f"attachment; filename={filename}"})
 
 # REMI COUNTER ROUTES
