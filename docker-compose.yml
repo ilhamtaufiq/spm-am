@@ -1,19 +1,22 @@
 services:
   app:
-    build: .
-    # Ports removed to avoid conflict with Coolify Proxy. 
-    # Coolify will automatically proxy to the internal port 80.
+    build:
+      context: .
+      args:
+        - COOLIFY_URL=${COOLIFY_URL:-}
+        - COOLIFY_FQDN=${COOLIFY_FQDN:-}
     expose:
-      - 3000
+      - 80
     volumes:
       - ./data:/app/data
       - ./static:/app/static
       - ./templates:/app/templates
     environment:
-      - SESSION_SECRET=spm-cianjur-super-secret-key-2026
+      - SESSION_SECRET=${SESSION_SECRET:-spm-cianjur-super-secret-key-2026}
       - DATABASE_URL=sqlite:///./data/spm_am.db
+      - PORT=80
     labels:
-      - "coolify.port=3000"
+      - "coolify.port=80"
     networks:
       - coolify
     restart: always

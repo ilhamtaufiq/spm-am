@@ -1,6 +1,16 @@
 FROM python:3.12-slim
 
-# Set working directory
+# Build-time arguments from Coolify
+ARG COOLIFY_URL
+ARG COOLIFY_FQDN
+ARG COOLIFY_BRANCH
+ARG COOLIFY_RESOURCE_UUID
+
+# Set environment variables
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
+ENV PORT=80
+
 WORKDIR /app
 
 # Install system dependencies
@@ -8,15 +18,15 @@ RUN apt-get update && apt-get install -y \
     build-essential \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy requirements first for better caching
+# Install Python dependencies
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy the rest of the application
+# Copy application code
 COPY . .
 
-# Expose the port FastAPI will run on
-EXPOSE 3000
+# Expose port (standard web port)
+EXPOSE 80
 
-# Command to run the application
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "3000"]
+# Run FastAPI with uvicorn
+CMD ["sh", "-c", "uvicorn main:app --host 0.0.0.0 --port ${PORT}"]
