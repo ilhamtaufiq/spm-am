@@ -724,7 +724,7 @@
                         <td style="font-size: 0.7rem;">${y.meta.kepala || '-'}</td>
                         <td>
                             <button class="btn btn-primary" style="padding: 4px 8px; font-size: 0.7rem;" 
-                                onclick="openEdit('${y.id}', '${item.desa} (${y.tahun})', '${y.sr}', '${y.kk}', '${y.jiwa}', '${y.bjp_kk || 0}', ${JSON.stringify(y.meta)})">Edit</button>
+                                onclick="openEdit('${y.id}', '${item.desa} (${y.tahun})')">Edit</button>
                         </td>
                     </tr>
                 `;
@@ -759,13 +759,32 @@
             }
         }
 
-        function openEdit(id, desa, sr, kk, jiwa, bjp_kk, meta) {
-            document.getElementById('modalTitle').innerText = 'Update ' + desa;
+        function openEdit(id, title) {
+            // Find data from global allItems
+            let foundData = null;
+            let foundYear = null;
+            
+            for (let item of allItems) {
+                foundYear = item.years_list.find(y => y.id == id);
+                if (foundYear) {
+                    foundData = item;
+                    break;
+                }
+            }
+
+            if (!foundYear) {
+                alert("Data tidak ditemukan!");
+                return;
+            }
+
+            const meta = foundYear.meta || {};
+
+            document.getElementById('modalTitle').innerText = 'Update ' + title;
             document.getElementById('updateForm').action = '/update/' + id;
-            document.getElementById('inputSR').value = sr;
-            document.getElementById('inputKK').value = kk;
-            document.getElementById('inputJiwa').value = jiwa;
-            document.getElementById('inputBJPKK').value = bjp_kk || 0;
+            document.getElementById('inputSR').value = foundYear.sr;
+            document.getElementById('inputKK').value = foundYear.kk;
+            document.getElementById('inputJiwa').value = foundYear.jiwa;
+            document.getElementById('inputBJPKK').value = foundYear.bjp_kk || 0;
             
             // Meta fields
             document.getElementById('inputSistem').value = meta.sistem_layanan || '';
