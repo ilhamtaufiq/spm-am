@@ -132,8 +132,33 @@ async def analyze_rab_post(request: Request, file: UploadFile = File(...)):
 @app.get("/remi", response_class=HTMLResponse)
 async def remi_list(request: Request, db: Session = Depends(get_db)):
     if not get_current_user(request): return RedirectResponse(url="/login")
-    games = db.query(RemiGame).order_by(RemiGame.id.desc()).all()
-    return templates.TemplateResponse(request=request, name="remi_list.html", context={"games": games})
+    games = db.query(RemiGame).order_by(RemiGame.created_at.desc()).all()
+    
+    # Hitung Juara Terbanyak (Top 3)
+    from sqlalchemy import func
+    top_winners = db.query(
+        RemiGame.winner_name, 
+        func.count(RemiGame.id).label('total_wins')
+    ).filter(RemiGame.winner_name != None)\
+     .group_by(RemiGame.winner_name)\
+     .order_by(func.count(RemiGame.id).desc())\
+     .limit(3).all()
+     
+    return templates.TemplateResponse(request=request, name="remi_list.html", context={
+        "games": games,
+        "top_winners": top_winners
+    })
+
+@app.post("/remi/{game_id}/delete")
+async def remi_delete_game(request: Request, game_id: int, db: Session = Depends(get_db)):
+    if not get_current_user(request): return RedirectResponse(url="/login")
+    game = db.query(RemiGame).filter(RemiGame.id == game_id).first()
+    if game:
+        # Hapus pemainnya dulu (Cascading manual jika FK tidak di-set)
+        db.query(RemiPlayer).filter(RemiPlayer.game_id == game_id).delete()
+        db.query(RemiGame).filter(RemiGame.id == game_id).delete()
+        db.commit()
+    return RedirectResponse(url="/remi", status_code=303)
 
 @app.post("/remi/new")
 async def remi_new(request: Request, p1: str = Form(...), p2: str = Form(...), p3: str = Form(...), p4: str = Form(...), db: Session = Depends(get_db)):

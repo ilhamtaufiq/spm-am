@@ -3,72 +3,125 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Remi Counter - AMS Super APP</title>
-    <link rel="stylesheet" href="/static/style.css">
+    <title>Remi Counter - Riwayat Permainan</title>
+    <link rel="stylesheet" href="/static/style.css?v=1.1">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;900&display=swap" rel="stylesheet">
+    <style>
+        .hall-of-fame {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+        }
+        .winner-card {
+            background: #fcd34d;
+            text-align: center;
+            padding: 1.5rem;
+            position: relative;
+        }
+        .rank-badge {
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            background: #000;
+            color: #fff;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 900;
+            border: 3px solid #fff;
+        }
+    </style>
 </head>
 <body>
     <div class="container">
         <header>
             <div>
                 <a href="/" style="text-decoration: none; color: inherit;"><h1>REMI COUNTER</h1></a>
-                <div class="subtitle">LEADERBOARD PERMAINAN REMI</div>
+                <div class="subtitle">Leaderboard & Riwayat Permainan</div>
             </div>
-            <div style="display: flex; gap: 1rem;">
-                <button class="btn btn-primary" onclick="document.getElementById('newGameModal').style.display='flex'">+ GAME BARU</button>
-                <a href="/" class="btn" style="background: white;">HUB</a>
-            </div>
+            <a href="/" class="btn btn-primary" style="background: white;">KEMBALI KE HUB</a>
         </header>
 
-        <div class="card" style="background: #fcd34d;">
-            <h2 style="font-weight: 900; margin-bottom: 1.5rem;">RIWAYAT PERMAINAN</h2>
+        {% if top_winners %}
+        <h2 style="font-weight: 900; margin-bottom: 1.5rem; text-transform: uppercase;">🏆 Juara Terbanyak (Hall of Fame)</h2>
+        <div class="hall-of-fame">
+            {% for winner in top_winners %}
+            <div class="card winner-card" style="background: {{ ['#fcd34d', '#e2e8f0', '#fbbf24'][loop.index0] }};">
+                <div class="rank-badge">#{{ loop.index }}</div>
+                <div style="font-size: 3rem; margin-bottom: 0.5rem;">👑</div>
+                <h3 style="font-weight: 900; text-transform: uppercase;">{{ winner.winner_name }}</h3>
+                <div style="font-weight: 900; font-size: 1.2rem; margin-top: 0.5rem;">{{ winner.total_wins }} KEMENANGAN</div>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <div class="card" style="background: var(--main); margin-bottom: 3rem;">
+            <h2 style="font-weight: 900; margin-bottom: 2rem;">MULAI GAME BARU</h2>
+            <form action="/remi/new" method="post">
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem;">
+                    <div class="form-group">
+                        <label style="font-weight: 900; display: block; margin-bottom: 0.5rem;">PEMAIN 1</label>
+                        <input type="text" name="p1" class="form-input" placeholder="Nama Pemain" required style="width: 100%;">
+                    </div>
+                    <div class="form-group">
+                        <label style="font-weight: 900; display: block; margin-bottom: 0.5rem;">PEMAIN 2</label>
+                        <input type="text" name="p2" class="form-input" placeholder="Nama Pemain" required style="width: 100%;">
+                    </div>
+                    <div class="form-group">
+                        <label style="font-weight: 900; display: block; margin-bottom: 0.5rem;">PEMAIN 3</label>
+                        <input type="text" name="p3" class="form-input" placeholder="Nama Pemain" required style="width: 100%;">
+                    </div>
+                    <div class="form-group">
+                        <label style="font-weight: 900; display: block; margin-bottom: 0.5rem;">PEMAIN 4</label>
+                        <input type="text" name="p4" class="form-input" placeholder="Nama Pemain" required style="width: 100%;">
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary" style="margin-top: 2rem; background: #000; color: #fff; width: 100%; font-size: 1.2rem;">GAS MAIN SEKARANG! 🃏</button>
+            </form>
+        </div>
+
+        <div class="card">
+            <h2 style="font-weight: 900; margin-bottom: 2rem;">RIWAYAT PERMAINAN</h2>
             <div class="table-container">
                 <table>
                     <thead>
                         <tr>
-                            <th>TANGGAL</th>
+                            <th>WAKTU</th>
+                            <th>ID GAME</th>
                             <th>STATUS</th>
                             <th>PEMENANG</th>
-                            <th>AKSI</th>
+                            <th>ACTION</th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for game in games %}
                         <tr>
-                            <td style="font-weight: 800;">{{ game.created_at }}</td>
+                            <td>{{ game.created_at }}</td>
+                            <td>#{{ game.id }}</td>
                             <td>
                                 {% if game.is_active %}
-                                <span class="badge" style="background: #60a5fa;">ACTIVE</span>
+                                <span class="status-badge status-high" style="background: #60a5fa;">SEDANG JALAN</span>
                                 {% else %}
-                                <span class="badge" style="background: #f87171;">FINISHED</span>
+                                <span class="status-badge" style="background: #94a3b8; color: white;">SELESAI</span>
                                 {% endif %}
                             </td>
-                            <td style="font-weight: 900; color: #10b981;">{{ game.winner_name or '-' }}</td>
-                            <td>
-                                <a href="/remi/{{ game.id }}" class="btn btn-sm" style="background: var(--main);">BUKA</a>
+                            <td style="font-weight: 900;">{{ game.winner_name or '-' }}</td>
+                            <td style="display: flex; gap: 0.5rem;">
+                                <a href="/remi/{{ game.id }}" class="btn btn-primary" style="padding: 0.5rem 1rem; font-size: 0.8rem;">LIHAT SKOR</a>
+                                <form action="/remi/{{ game.id }}/delete" method="post" onsubmit="return confirm('Yakin mau hapus game ini?')">
+                                    <button type="submit" class="btn btn-danger" style="padding: 0.5rem 1rem; font-size: 0.8rem; box-shadow: 2px 2px 0px #000;">HAPUS</button>
+                                </form>
                             </td>
                         </tr>
                         {% endfor %}
                     </tbody>
                 </table>
             </div>
-        </div>
-    </div>
-
-    <!-- New Game Modal -->
-    <div id="newGameModal" class="modal" style="display: none; position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:1000; justify-content:center; align-items:center;">
-        <div class="card" style="width: 100%; max-width: 500px; background: white;">
-            <h2 style="font-weight: 900; margin-bottom: 2rem;">MULAI GAME BARU</h2>
-            <form action="/remi/new" method="post" style="display: flex; flex-direction: column; gap: 1rem;">
-                <input type="text" name="p1" placeholder="Nama Pemain 1" class="form-input" required>
-                <input type="text" name="p2" placeholder="Nama Pemain 2" class="form-input" required>
-                <input type="text" name="p3" placeholder="Nama Pemain 3" class="form-input" required>
-                <input type="text" name="p4" placeholder="Nama Pemain 4" class="form-input" required>
-                <div style="display: flex; gap: 1rem; margin-top: 1rem;">
-                    <button type="submit" class="btn btn-primary" style="flex: 1;">MULAI SEKARANG</button>
-                    <button type="button" class="btn" style="background: #f87171;" onclick="document.getElementById('newGameModal').style.display='none'">BATAL</button>
-                </div>
-            </form>
         </div>
     </div>
 </body>
