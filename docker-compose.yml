@@ -14,7 +14,13 @@ services:
       - DATABASE_URL=sqlite:///./data/spm_am.db
     labels:
       - "coolify.port=3000"
+    networks:
+      - coolify
     restart: always
+
+networks:
+  coolify:
+    external: true
 
 volumes:
   data:
