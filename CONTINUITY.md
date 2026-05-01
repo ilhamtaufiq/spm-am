@@ -1,0 +1,24 @@
+- Goal: Resolve UI rendering issue in detail modal & enhance aesthetics.
+- Constraints/Assumptions:
+  - character escaping issues in JSON strings.
+  - Premium design (Neobrutalism).
+- Key decisions:
+  - Use ID-based lookup for openEdit to avoid JSON string escaping bugs.
+  - Implement 3D illustrations and CSS animations for "wow" factor.
+  - Integrated BJP (Bukan Jaringan Perpipaan) metrics into dashboard.
+- State:
+  - Done:
+    - Fixed openEdit JS logic.
+    - Added floating animations and hover effects.
+    - Added Hero illustration and icons.
+    - Integrated SIMSPAM technical/administrative fields.
+  - Now: Monitoring and final validation.
+  - Next: User feedback on the new look.
+- Open questions (UNCONFIRMED if needed): None.
+- Working set:
+  - main.py
+  - models.py
+  - templates/index.html
+  - static/style.css
+  - static/hero.png
+  - static/icons.png

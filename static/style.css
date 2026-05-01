@@ -30,9 +30,12 @@
 body {
     font-family: 'Outfit', sans-serif;
     background-color: var(--bg);
+    background-image: radial-gradient(var(--black) 1px, transparent 0);
+    background-size: 40px 40px;
     color: var(--text);
     padding: 2rem 1.5rem;
     min-height: 100vh;
+    transition: background-color 0.3s ease;
 }
 
 .container {
@@ -82,8 +85,43 @@ h1 {
     display: flex;
     flex-direction: column;
     justify-content: center;
-    transition: all 0.2s;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    animation: floating 4s ease-in-out infinite;
+    position: relative;
+    overflow: hidden;
 }
+
+.stat-card:hover {
+    transform: translate(-6px, -6px) scale(1.03);
+    box-shadow: 15px 15px 0px 0px #000;
+}
+
+.stat-card::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(45deg, transparent, rgba(255,255,255,0.2), transparent);
+    transform: rotate(45deg);
+    transition: 0.8s;
+}
+
+.stat-card:hover::after {
+    left: 100%;
+}
+
+@keyframes floating {
+    0% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+    100% { transform: translateY(0px); }
+}
+
+.stat-card:nth-child(2) { animation-delay: 0.5s; }
+.stat-card:nth-child(3) { animation-delay: 1s; }
+.stat-card:nth-child(4) { animation-delay: 1.5s; }
+.stat-card:nth-child(5) { animation-delay: 2s; }
 
 .stat-card:nth-child(1) { background: var(--main); }
 .stat-card:nth-child(2) { background: var(--accent); }
@@ -164,7 +202,9 @@ td {
 tr:last-child td { border-bottom: none; }
 
 tr:hover td {
-    background: rgba(0,0,0,0.02);
+    background: rgba(0,0,0,0.05);
+    transform: scale(1.002);
+    transition: all 0.2s;
 }
 
 /* Buttons */
@@ -224,6 +264,12 @@ tr:hover td {
     max-width: 500px;
     box-shadow: 10px 10px 0px 0px var(--black);
     position: relative;
+    animation: modalPop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes modalPop {
+    from { transform: scale(0.8); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
 }
 
 .modal-header {
@@ -262,4 +308,13 @@ tr:hover td {
     border: var(--border-width) solid var(--black);
     border-radius: 15px;
     font-weight: 600;
+}
+
+.hero-img {
+    filter: drop-shadow(15px 15px 0px var(--black));
+    transition: filter 0.3s ease;
+}
+
+[data-theme="dark"] .hero-img {
+    filter: drop-shadow(15px 15px 0px var(--white));
 }

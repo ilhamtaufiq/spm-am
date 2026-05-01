@@ -238,17 +238,23 @@
 
 <body>
     <div class="container">
-        <header>
-            <div>
-                <h1>SPM Air Minum</h1>
-                <div class="subtitle">DATA CAPAIAN KABUPATEN CIANJUR</div>
+        <div style="background: var(--white); border: var(--border-width) solid var(--black); border-radius: var(--radius); padding: 3rem; margin-bottom: 3rem; box-shadow: var(--shadow); display: flex; align-items: center; gap: 3rem; position: relative; overflow: hidden; animation: fadeIn 0.8s ease-out;">
+            <div style="flex: 1; z-index: 2;">
+                <div style="display: flex; gap: 0.5rem; margin-bottom: 1rem;">
+                    <span class="status-badge status-high" style="border: 2px solid #000;">LIVE DATA</span>
+                    <span class="status-badge" style="background: #e0f2fe; color: #0369a1; border: 2px solid #000;">v2.0 PRO</span>
+                </div>
+                <h1 style="font-size: 4.5rem; margin-bottom: 0.5rem; line-height: 0.85; color: var(--text);">SPM<br>SUPER APP</h1>
+                <p class="subtitle" style="font-size: 1.4rem; color: var(--text); margin-bottom: 2rem; font-weight: 600; opacity: 0.8;">Monitoring Capaian Akses Air Minum <br>Kabupaten Sukabumi</p>
+                <div style="display: flex; gap: 1.5rem;">
+                    <button class="btn btn-primary" onclick="openAddModal()" style="font-size: 1.1rem; padding: 1.2rem 2.5rem;">+ TAMBAH DATA</button>
+                    <button class="btn" style="background: #ffffff; font-size: 1.1rem;" onclick="toggleTheme()">THEME</button>
+                </div>
             </div>
-            <div style="display: flex; gap: 1.5rem; align-items: center; flex-wrap: wrap;">
-                <button class="btn btn-primary" onclick="openAddModal()">+ TAMBAH DATA</button>
-                <button class="btn" style="background: #f87171;" onclick="location.href='/'">HUB</button>
-                <button class="btn" style="background: #ffffff;" onclick="toggleTheme()">DARK MODE</button>
+            <div style="flex: 0 0 450px; position: relative; z-index: 1;">
+                <img src="/static/hero.png" alt="Hero" class="hero-img" style="width: 130%; height: auto; transform: rotate(5deg) translateX(40px);">
             </div>
-        </header>
+        </div>
 
 
         <div class="header" style="display: flex; justify-content: space-between; align-items: center;">
@@ -257,32 +263,39 @@
 
         <div class="stats-grid">
             <div class="stat-card">
-                <span class="label">Total Sambungan Rumah (SR)</span>
+                <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                    <span class="label">Total SR</span>
+                    <div style="width: 50px; height: 50px; background: rgba(0,0,0,0.05); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">🏠</div>
+                </div>
                 <span class="value">{{ "{:,}".format(total_sr) }}</span>
             </div>
             <div class="stat-card">
-                <span class="label">Total KK Terlayani</span>
+                <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                    <span class="label">Total KK (JP)</span>
+                    <div style="width: 50px; height: 50px; background: rgba(0,0,0,0.05); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">👨‍👩‍👧</div>
+                </div>
                 <span class="value">{{ "{:,}".format(total_kk) }}</span>
             </div>
-            <div class="stat-card">
-                <span class="label">Total Jiwa Terlayani</span>
+            <div class="stat-card" style="background: #fcd34d;">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                    <span class="label">Total Jiwa</span>
+                    <div style="width: 50px; height: 50px; background: rgba(0,0,0,0.05); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">👥</div>
+                </div>
                 <span class="value">{{ "{:,}".format(total_kk * 5) }}</span>
             </div>
-            <div class="stat-card" style="background: #e0f2fe; border-color: #7dd3fc;">
-                <span class="label" style="color: #0369a1;">Total KK BJP (Realisasi)</span>
-                <span class="value" style="color: #0c4a6e;">{{ "{:,}".format(total_bjp_kk) }}</span>
+            <div class="stat-card" style="background: #60a5fa;">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                    <span class="label">Total KK (BJP)</span>
+                    <div style="width: 50px; height: 50px; background: rgba(0,0,0,0.05); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">💧</div>
+                </div>
+                <span class="value">{{ "{:,}".format(total_bjp_kk) }}</span>
             </div>
-            <div class="stat-card" style="background: #f0f9ff; border-color: #bae6fd;">
-                <span class="label" style="color: #0369a1;">Total Jiwa BJP</span>
-                <span class="value" style="color: #0c4a6e;">{{ "{:,}".format(total_bjp_kk * 5) }}</span>
-            </div>
-            <div class="stat-card" style="background: #fef2f2; border-color: #fecaca;">
-                <span class="label" style="color: #991b1b;">Total Capaian (JP + BJP)</span>
-                <span class="value" style="color: #7f1d1d;">{{ "%.2f"|format(total_combined_percentage) }}%</span>
-            </div>
-            <div class="stat-card">
-                <span class="label">Total Target Layanan</span>
-                <span class="value">{{ "{:,}".format(total_target) }}</span>
+            <div class="stat-card" style="background: #d8b4fe;">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                    <span class="label">Capaian Akhir</span>
+                    <div style="width: 50px; height: 50px; background: rgba(0,0,0,0.05); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">🎯</div>
+                </div>
+                <span class="value">{{ "%.2f"|format(total_combined_percentage) }}%</span>
             </div>
         </div>
 
