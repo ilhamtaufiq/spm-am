@@ -351,10 +351,9 @@
                     <thead>
                         <tr>
                             <th>Tahun</th>
-                            <th>SR</th>
-                            <th>KK</th>
-                            <th>Jiwa</th>
-                            <th>Dana / Program</th>
+                            <th>SR (JP)</th>
+                            <th>KK (JP)</th>
+                            <th style="color: #0369a1;">KK (BJP)</th>
                             <th>Sistem</th>
                             <th>Iuran / Ops</th>
                             <th>Pengelola (Kepala)</th>
@@ -401,8 +400,12 @@
                     </div>
                 </div>
                 <div class="form-group">
-                    <label>Jumlah KK</label>
-                    <input type="number" name="jumlah_kk" value="0" required>
+                    <label>Jumlah KK (JP)</label>
+                    <input type="number" name="jumlah_kk" value="0" required min="0">
+                </div>
+                <div class="form-group" style="background: #f0f9ff; padding: 10px; border-radius: 8px; border: 1px solid #7dd3fc;">
+                    <label style="color: #0369a1; font-weight: 600;">Jumlah KK (BJP)</label>
+                    <input type="number" name="jumlah_bjp_kk" value="0" min="0" style="border-color: #7dd3fc;">
                 </div>
                 <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
                     <button type="submit" class="btn btn-primary" style="flex: 1;">Simpan Data</button>
@@ -422,12 +425,16 @@
                     <input type="number" step="1" name="jumlah_sr" id="inputSR" required>
                 </div>
                 <div class="form-group">
-                    <label>Jumlah KK Terlayani</label>
+                    <label>Jumlah KK (JP)</label>
                     <input type="number" step="1" name="jumlah_kk" id="inputKK" required>
                 </div>
-                <div class="form-group">
-                    <label>Jumlah Jiwa Terlayani</label>
-                    <input type="number" step="1" name="jumlah_jiwa" id="inputJiwa" required>
+                <div class="form-group" style="background: #f0f9ff; padding: 10px; border-radius: 8px; border: 1px solid #7dd3fc;">
+                    <label style="color: #0369a1; font-weight: 600;">Jumlah KK (BJP)</label>
+                    <input type="number" step="1" name="jumlah_bjp_kk" id="inputBJPKK" required>
+                </div>
+                <div class="form-group" style="display:none;">
+                    <label>Jumlah Jiwa (JP)</label>
+                    <input type="number" step="1" name="jumlah_jiwa" id="inputJiwa">
                 </div>
                 <div style="display: flex; gap: 1rem; justify-content: flex-end;">
                     <button type="button" class="btn" style="background: var(--border);"
@@ -626,11 +633,7 @@
                         <td><strong>${y.tahun}</strong></td>
                         <td style="font-weight:700">${y.sr}</td>
                         <td style="font-weight:700">${y.kk}</td>
-                        <td>${y.jiwa}</td>
-                        <td style="font-size: 0.7rem;">
-                            <strong>${y.meta.sumber_dana || '-'}</strong><br>
-                            <span style="color: var(--text-muted)">${y.meta.program || '-'}</span>
-                        </td>
+                        <td style="color: #0369a1; font-weight: 700;">${(y.bjp_kk || 0).toLocaleString()}</td>
                         <td style="font-size: 0.7rem;">${y.meta.sistem_layanan || '-'}</td>
                         <td style="font-size: 0.7rem;">
                             Iuran: ${y.meta.iuran_nominal || '-'}<br>
@@ -639,11 +642,12 @@
                         <td style="font-size: 0.7rem;">${y.meta.kepala || '-'}</td>
                         <td>
                             <button class="btn btn-primary" style="padding: 4px 8px; font-size: 0.7rem;" 
-                                onclick="openEdit('${y.id}', '${item.desa} (${y.tahun})', '${y.sr}', '${y.kk}', '${y.jiwa}')">Edit</button>
+                                onclick="openEdit('${y.id}', '${item.desa} (${y.tahun})', '${y.sr}', '${y.kk}', '${y.jiwa}', '${y.bjp_kk || 0}')">Edit</button>
                         </td>
                     </tr>
                 `;
             });
+
             document.getElementById('detailModal').style.display = 'flex';
         }
 
@@ -673,12 +677,13 @@
             }
         }
 
-        function openEdit(id, desa, sr, kk, jiwa) {
+        function openEdit(id, desa, sr, kk, jiwa, bjp_kk) {
             document.getElementById('modalTitle').innerText = 'Update ' + desa;
             document.getElementById('updateForm').action = '/update/' + id;
             document.getElementById('inputSR').value = sr;
             document.getElementById('inputKK').value = kk;
             document.getElementById('inputJiwa').value = jiwa;
+            document.getElementById('inputBJPKK').value = bjp_kk || 0;
             document.getElementById('editModal').style.display = 'flex';
         }
 

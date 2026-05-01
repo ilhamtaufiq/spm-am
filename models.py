@@ -46,6 +46,8 @@ class Achievement(Base):
     jumlah_sr = Column(Integer, default=0)
     jumlah_kk = Column(Integer, default=0)
     jumlah_jiwa = Column(Integer, default=0)
+    jumlah_bjp_kk = Column(Integer, default=0)
+    jumlah_bjp_jiwa = Column(Integer, default=0)
     target = Column(Integer, default=0)
 
 class RemiGame(Base):

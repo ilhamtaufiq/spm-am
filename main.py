@@ -91,21 +91,40 @@ async def read_root(request: Request, db: Session = Depends(get_db)):
     for item in items_raw:
         key = (item.kecamatan.upper(), item.desa.upper())
         if key not in grouped:
-            # Get BJP KK for this village
-            bjp_kk = bjp_map.get(key, 0)
+            # Use DB value if exists and not zero, otherwise fallback to .md file
+            bjp_kk = item.jumlah_bjp_kk if (item.jumlah_bjp_kk and item.jumlah_bjp_kk > 0) else bjp_map.get(key, 0)
             grouped[key] = {
                 "kecamatan": item.kecamatan, 
                 "desa": item.desa, 
                 "target": item.target, 
                 "total_sr": 0, "total_kk": 0, 
-                "bjp_kk": bjp_kk,
-                "bjp_jiwa": bjp_kk * 5,
+                "total_bjp_kk": 0, # We'll sum this up
                 "years_list": []
             }
+        
+        bjp_kk_row = item.jumlah_bjp_kk or 0
         grouped[key]["total_sr"] += (item.jumlah_sr or 0)
         grouped[key]["total_kk"] += (item.jumlah_kk or 0)
-        grouped[key]["years_list"].append({"id": item.id, "tahun": item.tahun, "sr": item.jumlah_sr or 0, "kk": item.jumlah_kk or 0, "jiwa": item.jumlah_jiwa or 0})
+        grouped[key]["total_bjp_kk"] += bjp_kk_row
+        grouped[key]["years_list"].append({
+            "id": item.id, "tahun": item.tahun, 
+            "sr": item.jumlah_sr or 0, "kk": item.jumlah_kk or 0, "jiwa": item.jumlah_jiwa or 0,
+            "bjp_kk": bjp_kk_row, "bjp_jiwa": (bjp_kk_row * 5),
+            "meta": {
+                "sumber_dana": item.sumber_dana, "program": item.program,
+                "sistem_layanan": item.sistem_layanan, "kepala": item.kepala,
+                "iuran_nominal": item.iuran_nominal, "biaya_operasional": item.biaya_operasional
+            }
+        })
         
+    for key, data in grouped.items():
+        # If total_bjp_kk is still 0 across all years, use the .md fallback for the summary
+        if data["total_bjp_kk"] == 0:
+            data["bjp_kk"] = bjp_map.get(key, 0)
+        else:
+            data["bjp_kk"] = data["total_bjp_kk"]
+        data["bjp_jiwa"] = data["bjp_kk"] * 5
+
     display_items = sorted(grouped.values(), key=lambda x: (x["kecamatan"], x["desa"]))
     
     # Calculate Totals
@@ -135,23 +154,30 @@ async def read_root(request: Request, db: Session = Depends(get_db)):
     })
 
 @app.post("/add")
-async def add_data(request: Request, kecamatan: str = Form(...), desa: str = Form(...), tahun: str = Form(...), jumlah_sr: int = Form(...), jumlah_kk: int = Form(...), db: Session = Depends(get_db)):
+async def add_data(request: Request, kecamatan: str = Form(...), desa: str = Form(...), tahun: str = Form(...), jumlah_sr: int = Form(...), jumlah_kk: int = Form(...), jumlah_bjp_kk: int = Form(0), db: Session = Depends(get_db)):
     if not get_current_user(request): return RedirectResponse(url="/login", status_code=302)
     existing = db.query(Achievement).filter(Achievement.desa == desa).first()
     target = existing.target if existing else 0
-    new_item = Achievement(kecamatan=kecamatan, desa=desa, tahun=tahun, jumlah_sr=jumlah_sr, jumlah_kk=jumlah_kk, jumlah_jiwa=jumlah_kk*5, target=target, sumber_dana="Update Manual", program="Update Manual")
+    new_item = Achievement(
+        kecamatan=kecamatan, desa=desa, tahun=tahun, 
+        jumlah_sr=jumlah_sr, jumlah_kk=jumlah_kk, jumlah_jiwa=jumlah_kk*5, 
+        jumlah_bjp_kk=jumlah_bjp_kk, jumlah_bjp_jiwa=jumlah_bjp_kk*5,
+        target=target, sumber_dana="Update Manual", program="Update Manual"
+    )
     db.add(new_item)
     db.commit()
     return RedirectResponse(url="/spm", status_code=303)
 
 @app.post("/update/{item_id}")
-async def update_item(request: Request, item_id: int, jumlah_sr: int = Form(...), jumlah_kk: int = Form(...), db: Session = Depends(get_db)):
+async def update_item(request: Request, item_id: int, jumlah_sr: int = Form(...), jumlah_kk: int = Form(...), jumlah_bjp_kk: int = Form(0), db: Session = Depends(get_db)):
     if not get_current_user(request): return RedirectResponse(url="/login", status_code=302)
     item = db.query(Achievement).filter(Achievement.id == item_id).first()
     if item:
         item.jumlah_sr = jumlah_sr
         item.jumlah_kk = jumlah_kk
         item.jumlah_jiwa = jumlah_kk * 5
+        item.jumlah_bjp_kk = jumlah_bjp_kk
+        item.jumlah_bjp_jiwa = jumlah_bjp_kk * 5
         db.commit()
     return RedirectResponse(url="/spm", status_code=303)
 
