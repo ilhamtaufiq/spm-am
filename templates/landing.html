@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cianjur Tool Hub</title>
+    <title>AMS SUPER APP</title>
     <link rel="stylesheet" href="/static/style.css">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;900&display=swap" rel="stylesheet">
     <style>
@@ -13,6 +14,7 @@
             gap: 2.5rem;
             margin-top: 4rem;
         }
+
         .service-card {
             text-decoration: none;
             color: inherit;
@@ -23,23 +25,28 @@
             transition: all 0.2s;
             position: relative;
         }
+
         .service-card:hover {
             transform: translate(-4px, -4px);
             box-shadow: 10px 10px 0px 0px #000;
         }
+
         .icon-box {
             font-size: 4rem;
             margin-bottom: 1rem;
         }
+
         .service-card h2 {
             font-size: 2rem;
             font-weight: 900;
             text-transform: uppercase;
         }
+
         .service-card p {
             font-weight: 600;
             opacity: 0.8;
         }
+
         .badge-new {
             position: absolute;
             top: -15px;
@@ -54,6 +61,7 @@
         }
     </style>
 </head>
+
 <body>
     <div class="container">
         <header>
@@ -79,7 +87,15 @@
                 <h2>Analisa RAB</h2>
                 <p>Ekstraksi dan standarisasi data RAB dari Excel MCK ke format yang siap diolah.</p>
             </a>
+
+            <a href="/remi" class="service-card card" style="background: #fda4af;">
+                <span class="badge-new">GAME</span>
+                <div class="icon-box">🃏</div>
+                <h2>Remi Counter</h2>
+                <p>Leaderboard permainan remi dengan mekanik salip-salipan (Overtake Reset).</p>
+            </a>
         </div>
     </div>
 </body>
+
 </html>

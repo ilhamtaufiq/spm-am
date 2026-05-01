@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game {{ game.id }} - Remi Counter</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;900&display=swap" rel="stylesheet">
+    <style>
+        .player-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+        }
+        .player-card {
+            text-align: center;
+            padding: 2rem;
+            position: relative;
+        }
+        .player-card .score {
+            font-size: 3.5rem;
+            font-weight: 900;
+            margin: 1rem 0;
+        }
+        .overtake-alert {
+            position: absolute;
+            top: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #ff5c5c;
+            color: white;
+            padding: 4px 12px;
+            border: 2px solid #000;
+            font-weight: 900;
+            font-size: 0.7rem;
+            white-space: nowrap;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div>
+                <a href="/remi" style="text-decoration: none; color: inherit;"><h1>REMI GAME #{{ game.id }}</h1></a>
+                <div class="subtitle">MULAI: {{ game.created_at }}</div>
+            </div>
+            <div>
+                {% if not game.is_active %}
+                <div class="card" style="background: #10b981; padding: 1rem 2rem; border-width: 4px;">
+                    <h2 style="color: white; font-weight: 900;">🏆 PEMENANG: {{ game.winner_name }}</h2>
+                </div>
+                {% endif %}
+            </div>
+        </header>
+
+        <div class="player-grid">
+            {% for player in players %}
+            <div class="card player-card" style="background: {{ ['#d8b4fe', '#fcd34d', '#60a5fa', '#fda4af'][loop.index0] }};">
+                <h3 style="font-weight: 900; text-transform: uppercase;">{{ player.name }}</h3>
+                <div class="score">{{ player.total_score }}</div>
+                
+                {% if game.is_active %}
+                <form action="/remi/{{ game.id }}/update" method="post" style="display: flex; gap: 0.5rem; margin-top: 1rem;">
+                    <input type="hidden" name="player_id" value="{{ player.id }}">
+                    <input type="number" name="added_points" placeholder="+ Skor" class="form-input" style="background: white; text-align: center; font-weight: 900;" required>
+                    <button type="submit" class="btn btn-primary" style="padding: 0 1rem; background: black;">OK</button>
+                </form>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+
+        <div class="card" style="background: #ffffff; border-style: dashed;">
+            <h3 style="font-weight: 900; margin-bottom: 1rem;">ATURAN MAIN (MECHANICS):</h3>
+            <ul style="font-weight: 600; line-height: 1.8;">
+                <li>🔥 <strong>Overtake Reset</strong>: Jika skor baru Anda melewati total skor lawan, skor lawan tersebut akan langsung <strong>RESET KE NOL</strong>.</li>
+                <li>🏆 <strong>Victory</strong>: Pemain pertama yang mencapai <strong>1000 poin</strong> dinyatakan sebagai pemenang.</li>
+                <li>⚡ <strong>Strategy</strong>: Gunakan penambahan poin kecil untuk menyalip lawan dan menghanguskan poin mereka!</li>
+            </ul>
+        </div>
+    </div>
+</body>
+</html>

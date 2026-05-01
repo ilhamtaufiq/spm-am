@@ -10,6 +10,8 @@ import os
 import shutil
 from io import BytesIO
 import extract_rab
+from datetime import datetime
+from models import RemiGame, RemiPlayer
 
 # Database Seeding Logic
 DATABASE_PATH = "./data/spm_am.db"
@@ -24,7 +26,7 @@ if not os.path.exists(DATABASE_PATH) or os.path.getsize(DATABASE_PATH) == 0:
 
 models.Base.metadata.create_all(bind=engine)
 
-app = FastAPI(title="Cianjur Tool Hub")
+app = FastAPI(title="AMS Super APP")
 app.add_middleware(SessionMiddleware, secret_key=os.getenv("SESSION_SECRET", "spm-cianjur-secret-key-2026"))
 app.mount("/static", StaticFiles(directory="static"), name="static")
 templates = Jinja2Templates(directory="templates")
@@ -125,6 +127,58 @@ async def analyze_rab_post(request: Request, file: UploadFile = File(...)):
     output_buffer = extract_rab.create_xlsx_buffer(results)
     filename = f"Analisa_RAB_{file.filename}"
     return StreamingResponse(output_buffer, media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", headers={"Content-Disposition": f"attachment; filename={filename}"})
+
+# REMI COUNTER ROUTES
+@app.get("/remi", response_class=HTMLResponse)
+async def remi_list(request: Request, db: Session = Depends(get_db)):
+    if not get_current_user(request): return RedirectResponse(url="/login")
+    games = db.query(RemiGame).order_by(RemiGame.id.desc()).all()
+    return templates.TemplateResponse(request=request, name="remi_list.html", context={"games": games})
+
+@app.post("/remi/new")
+async def remi_new(request: Request, p1: str = Form(...), p2: str = Form(...), p3: str = Form(...), p4: str = Form(...), db: Session = Depends(get_db)):
+    if not get_current_user(request): return RedirectResponse(url="/login")
+    new_game = RemiGame(created_at=datetime.now().strftime("%Y-%m-%d %H:%M"))
+    db.add(new_game)
+    db.commit()
+    db.refresh(new_game)
+    
+    for name in [p1, p2, p3, p4]:
+        player = RemiPlayer(game_id=new_game.id, name=name, total_score=0)
+        db.add(player)
+    db.commit()
+    return RedirectResponse(url=f"/remi/{new_game.id}", status_code=303)
+
+@app.get("/remi/{game_id}", response_class=HTMLResponse)
+async def remi_dashboard(request: Request, game_id: int, db: Session = Depends(get_db)):
+    if not get_current_user(request): return RedirectResponse(url="/login")
+    game = db.query(RemiGame).filter(RemiGame.id == game_id).first()
+    players = db.query(RemiPlayer).filter(RemiPlayer.game_id == game_id).all()
+    return templates.TemplateResponse(request=request, name="remi_game.html", context={"game": game, "players": players})
+
+@app.post("/remi/{game_id}/update")
+async def remi_update_score(request: Request, game_id: int, player_id: int = Form(...), added_points: int = Form(...), db: Session = Depends(get_db)):
+    if not get_current_user(request): return RedirectResponse(url="/login")
+    game = db.query(RemiGame).filter(RemiGame.id == game_id).first()
+    if not game or not game.is_active: return RedirectResponse(url=f"/remi/{game_id}")
+    
+    player = db.query(RemiPlayer).filter(RemiPlayer.id == player_id).first()
+    current_score = player.total_score
+    new_score = current_score + added_points
+    
+    # Overtake Logic
+    others = db.query(RemiPlayer).filter(RemiPlayer.game_id == game_id, RemiPlayer.id != player_id).all()
+    for other in others:
+        if current_score < other.total_score <= new_score:
+            other.total_score = 0
+            
+    player.total_score = new_score
+    if player.total_score >= 1000:
+        game.is_active = 0
+        game.winner_name = player.name
+        
+    db.commit()
+    return RedirectResponse(url=f"/remi/{game_id}", status_code=303)
 
 if __name__ == "__main__":
     import uvicorn

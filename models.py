@@ -47,3 +47,17 @@ class Achievement(Base):
     jumlah_kk = Column(Integer, default=0)
     jumlah_jiwa = Column(Integer, default=0)
     target = Column(Integer, default=0)
+
+class RemiGame(Base):
+    __tablename__ = "remi_games"
+    id = Column(Integer, primary_key=True, index=True)
+    created_at = Column(String)
+    is_active = Column(Integer, default=1)
+    winner_name = Column(String, nullable=True)
+
+class RemiPlayer(Base):
+    __tablename__ = "remi_players"
+    id = Column(Integer, primary_key=True, index=True)
+    game_id = Column(Integer)
+    name = Column(String)
+    total_score = Column(Integer, default=0)
