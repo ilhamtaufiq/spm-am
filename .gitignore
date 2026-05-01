@@ -1,0 +1,10 @@
+venv/
+.venv/
+__pycache__/
+.wrangler/
+.vscode/
+node_modules/
+*.sql
+scratch/
+.env
+data/*.db

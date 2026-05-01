@@ -1,0 +1,16 @@
+services:
+  app:
+    build: .
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./data:/app/data
+      - ./static:/app/static
+      - ./templates:/app/templates
+    environment:
+      - SESSION_SECRET=spm-cianjur-super-secret-key-2026
+      - DATABASE_URL=sqlite:///./data/spm_am.db
+    restart: always
+
+volumes:
+  data:

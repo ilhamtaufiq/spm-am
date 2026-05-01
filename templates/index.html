@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SPM Air Minum Cianjur - Dashboard</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <style>
+        .column-toggles {
+            background: var(--card-bg);
+            padding: 1rem;
+            border-radius: 12px;
+            margin-bottom: 1.5rem;
+            border: 1px solid var(--border);
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            align-items: center;
+        }
+        .toggle-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.85rem;
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: 6px;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            transition: all 0.2s;
+        }
+        .toggle-item:hover {
+            border-color: var(--accent);
+        }
+        .toggle-item input {
+            cursor: pointer;
+        }
+        .hidden-col {
+            display: none !important;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        .stat-card {
+            background: var(--card-bg);
+            padding: 1.5rem;
+            border-radius: 16px;
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow);
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        .stat-card .label {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+        .stat-card .value {
+            font-size: 1.75rem;
+            font-weight: 800;
+            color: var(--accent);
+        }
+        .filter-bar {
+            background: var(--card-bg);
+            padding: 1rem;
+            border-radius: 12px;
+            margin-bottom: 1rem;
+            border: 1px solid var(--border);
+            display: grid;
+            grid-template-columns: 1fr 250px;
+            gap: 1rem;
+            align-items: center;
+        }
+        .filter-input {
+            padding: 10px 16px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            background: var(--bg);
+            color: var(--text);
+            font-size: 0.9rem;
+            width: 100%;
+        }
+        .filter-input:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+        .status-badge {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            display: inline-block;
+        }
+        .status-low { background: #fee2e2; color: #dc2626; }
+        .status-med { background: #fef3c7; color: #d97706; }
+        .status-high { background: #dcfce7; color: #16a34a; }
+
+        thead th {
+            position: sticky;
+            top: 0;
+            background: var(--card-bg);
+            z-index: 10;
+            box-shadow: 0 1px 0 var(--border);
+        }
+        .filter-section {
+            background: var(--card-bg);
+            padding: 1rem;
+            border-radius: 12px;
+            margin-bottom: 1rem;
+            border: 1px solid var(--border);
+        }
+        .toggle-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            align-items: center;
+        }
+        .toggle-btn {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s;
+        }
+        .toggle-btn:hover {
+            border-color: var(--accent);
+        }
+        .toggle-btn input {
+            cursor: pointer;
+        }
+
+        .modal select {
+            width: 100%;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            background: #fff;
+            color: #1e293b; /* Dark text for clarity */
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+        }
+        [data-theme="dark"] .modal select {
+            background: #334155;
+            color: #f8fafc;
+        }
+        .pagination-btn {
+            padding: 8px 12px;
+            border-radius: 6px;
+            border: 1px solid var(--border);
+            background: var(--card-bg);
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: all 0.2s;
+        }
+        .pagination-btn:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+        .pagination-btn.active {
+            background: #2563eb !important; /* Force a clear blue */
+            color: #ffffff !important;
+            border-color: #2563eb !important;
+            font-weight: 700;
+        }
+        .pagination-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .btn-detail {
+            background: #2563eb;
+            color: #ffffff;
+            padding: 6px 14px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-block;
+        }
+        .btn-detail:hover {
+            background: #1d4ed8;
+            box-shadow: 0 2px 4px rgba(37, 99, 235, 0.2);
+        }
+    </style>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;800&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <div>
+                <h1>SPM Air Minum</h1>
+                <p style="color: var(--text-muted);">Data Capaian Kabupaten Cianjur</p>
+            </div>
+            <button class="btn btn-primary" onclick="toggleTheme()">Toggle Theme</button>
+        </header>
+
+        <!-- New Hierarchical Update Form -->
+        <div class="card" style="margin-bottom: 2rem; padding: 1.5rem;">
+            <h3 style="margin-bottom: 1rem; font-size: 1.125rem;">Quick Update Capaian</h3>
+            <form id="quickUpdateForm"
+                style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; align-items: end;">
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label>Kecamatan</label>
+                    <select id="selectKecamatan" class="form-select" required>
+                        <option value="">Pilih Kecamatan</option>
+                    </select>
+                </div>
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label>Desa</label>
+                    <select id="selectDesa" class="form-select" required disabled>
+                        <option value="">Pilih Desa</option>
+                    </select>
+                </div>
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label>Tahun</label>
+                    <select id="selectTahun" class="form-select" required disabled>
+                        <option value="">Pilih Tahun</option>
+                    </select>
+                </div>
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label>Jumlah SR</label>
+                    <input type="number" step="1" id="inputQuickSR" placeholder="0" required>
+                </div>
+                <button type="submit" class="btn btn-primary" style="height: 42px;">Update Data</button>
+            </form>
+        </div>
+
+        <div class="header" style="display: flex; justify-content: space-between; align-items: center;">
+            <div>
+                <h1>SPM Air Minum Kabupaten Cianjur</h1>
+                <p>Dashboard Monitoring Capaian Sambungan Rumah (SR)</p>
+            </div>
+            <div style="display: flex; gap: 1rem; align-items: center;">
+                <button class="btn" onclick="location.href='/logout'" style="background: transparent; border: 1px solid var(--border); color: var(--text-muted); padding: 8px 16px;">Logout</button>
+                <button class="btn btn-primary" onclick="openAddModal()" style="background: #10b981;">+ Tambah Data</button>
+            </div>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <span class="label">Total Sambungan Rumah (SR)</span>
+                <span class="value">{{ "{:,}".format(total_sr) }}</span>
+            </div>
+            <div class="stat-card">
+                <span class="label">Total KK Terlayani</span>
+                <span class="value">{{ "{:,}".format(total_kk) }}</span>
+            </div>
+            <div class="stat-card">
+                <span class="label">Total Target Layanan</span>
+                <span class="value">{{ "{:,}".format(total_target) }}</span>
+            </div>
+            <div class="stat-card" style="border-left: 4px solid #10b981;">
+                <span class="label">Capaian Layanan (%)</span>
+                <span class="value" style="color: #10b981;">{{ "%.2f"|format(total_percentage) }}%</span>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="filter-bar">
+                <input type="text" id="searchInput" class="filter-input" placeholder="Cari Desa..." onkeyup="applyFilters()">
+                <select id="kecamatanFilter" class="filter-input" onchange="applyFilters()">
+                    <option value="">Semua Kecamatan</option>
+                    {% for kec in kecamatan_list %}
+                    <option value="{{ kec }}">{{ kec }}</option>
+                    {% endfor %}
+                </select>
+                <select id="yearFilter" class="filter-input" onchange="applyFilters()">
+                    <option value="All">Semua Tahun (Akumulasi)</option>
+                    {% for yr in available_years %}
+                    <option value="{{ yr }}">Tahun {{ yr }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Kecamatan</th>
+                            <th>Desa</th>
+                            <th class="col-sr">Total SR</th>
+                            <th class="col-kk">Total KK</th>
+                            <th>Target</th>
+                            <th>Capaian (%)</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody">
+                        <!-- Rows will be injected by JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination Controls -->
+            <div id="pagination" class="pagination-container" style="display: flex; justify-content: center; align-items: center; gap: 0.5rem; margin-top: 1.5rem; padding-bottom: 1rem;">
+                <!-- Buttons will be injected by JavaScript -->
+            </div>
+        </div>
+        </div>
+    </div>
+
+    <!-- Detail Modal -->
+    <div id="detailModal" class="modal-overlay" style="display: none;">
+        <div class="modal" style="max-width: 900px;">
+            <div class="modal-header">
+                <h2 id="detailTitle">Breakdown Per Tahun</h2>
+                <span class="close" onclick="closeModal('detailModal')">&times;</span>
+            </div>
+            <div class="table-container" style="margin-top: 1rem;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Tahun</th>
+                            <th>SR</th>
+                            <th>KK</th>
+                            <th>Jiwa</th>
+                            <th>Dana / Program</th>
+                            <th>Sistem</th>
+                            <th>Iuran / Ops</th>
+                            <th>Pengelola (Kepala)</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="detailTableBody"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Data Modal -->
+    <div id="addModal" class="modal-overlay" style="display: none;">
+        <div class="modal">
+            <div class="modal-header">
+                <h2>Input Data Baru</h2>
+                <span class="close" onclick="closeModal('addModal')">&times;</span>
+            </div>
+            <form action="/add" method="POST">
+                <div class="form-group">
+                    <label>Kecamatan</label>
+                    <select name="kecamatan" required onchange="loadVillages(this.value)">
+                        <option value="">Pilih Kecamatan...</option>
+                        {% for kec in kecamatan_list %}
+                        <option value="{{ kec }}">{{ kec }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Desa</label>
+                    <select name="desa" id="addDesaDropdown" required>
+                        <option value="">Pilih Desa...</option>
+                    </select>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                    <div class="form-group">
+                        <label>Tahun</label>
+                        <input type="text" name="tahun" placeholder="Contoh: 2026" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Jumlah SR</label>
+                        <input type="number" name="jumlah_sr" value="0" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Jumlah KK</label>
+                    <input type="number" name="jumlah_kk" value="0" required>
+                </div>
+                <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
+                    <button type="submit" class="btn btn-primary" style="flex: 1;">Simpan Data</button>
+                    <button type="button" class="btn" onclick="closeModal('addModal')" style="flex: 1;">Batal</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Edit Modal -->
+    <div id="editModal" class="modal-overlay" style="display: none;">
+        <div class="modal">
+            <h2 id="modalTitle" style="margin-bottom: 1.5rem;">Update Data</h2>
+            <form id="updateForm" method="POST">
+                <div class="form-group">
+                    <label>Jumlah SR (Unit)</label>
+                    <input type="number" step="1" name="jumlah_sr" id="inputSR" required>
+                </div>
+                <div class="form-group">
+                    <label>Jumlah KK Terlayani</label>
+                    <input type="number" step="1" name="jumlah_kk" id="inputKK" required>
+                </div>
+                <div class="form-group">
+                    <label>Jumlah Jiwa Terlayani</label>
+                    <input type="number" step="1" name="jumlah_jiwa" id="inputJiwa" required>
+                </div>
+                <div style="display: flex; gap: 1rem; justify-content: flex-end;">
+                    <button type="button" class="btn" style="background: var(--border);"
+                        onclick="closeModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Hierarchical Selection Logic
+        const selectKecamatan = document.getElementById('selectKecamatan');
+        const selectDesa = document.getElementById('selectDesa');
+        const selectTahun = document.getElementById('selectTahun');
+        const quickUpdateForm = document.getElementById('quickUpdateForm');
+
+        // Load Kecamatan on page load
+        fetch('/api/kecamatan')
+            .then(res => res.json())
+            .then(data => {
+                data.sort().forEach(kec => {
+                    const opt = document.createElement('option');
+                    opt.value = kec;
+                    opt.innerText = kec;
+                    selectKecamatan.appendChild(opt);
+                });
+            });
+
+        selectKecamatan.addEventListener('change', () => {
+            const kec = selectKecamatan.value;
+            selectDesa.innerHTML = '<option value="">Pilih Desa</option>';
+            selectTahun.innerHTML = '<option value="">Pilih Tahun</option>';
+            selectTahun.disabled = true;
+
+            if (kec) {
+                fetch(`/api/desa/${kec}`)
+                    .then(res => res.json())
+                    .then(data => {
+                        data.sort().forEach(desa => {
+                            const opt = document.createElement('option');
+                            opt.value = desa;
+                            opt.innerText = desa;
+                            selectDesa.appendChild(opt);
+                        });
+                        selectDesa.disabled = false;
+                    });
+            } else {
+                selectDesa.disabled = true;
+            }
+        });
+
+        selectDesa.addEventListener('change', () => {
+            const kec = selectKecamatan.value;
+            const desa = selectDesa.value;
+            selectTahun.innerHTML = '<option value="">Pilih Tahun</option>';
+
+            if (desa) {
+                fetch(`/api/tahun/${kec}/${desa}`)
+                    .then(res => res.json())
+                    .then(data => {
+                        data.sort().forEach(tahun => {
+                            const opt = document.createElement('option');
+                            opt.value = tahun;
+                            opt.innerText = tahun;
+                            selectTahun.appendChild(opt);
+                        });
+                        selectTahun.disabled = false;
+                    });
+            } else {
+                selectTahun.disabled = true;
+            }
+        });
+
+        quickUpdateForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const formData = new FormData();
+            formData.append('kecamatan', selectKecamatan.value);
+            formData.append('desa', selectDesa.value);
+            formData.append('tahun', selectTahun.value);
+            formData.append('jumlah_sr', document.getElementById('inputQuickSR').value);
+
+            fetch('/api/update-v2', {
+                method: 'POST',
+                body: formData
+            })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        alert('Data berhasil diperbarui!');
+                        window.location.reload();
+                    } else {
+                        alert('Error: ' + data.message);
+                    }
+                });
+        });
+
+        function toggleTheme() {
+            const body = document.body;
+            const theme = body.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+            body.setAttribute('data-theme', theme);
+            localStorage.setItem('theme', theme);
+        }
+
+        // Load saved theme
+        if (localStorage.getItem('theme') === 'dark') {
+            document.body.setAttribute('data-theme', 'dark');
+        }
+
+        function toggleCol(cls) {
+            const elements = document.getElementsByClassName(cls);
+            for (let el of elements) {
+                el.classList.toggle('hidden-col');
+            }
+        }
+
+        // Pagination Logic
+        const allItems = {{ items|tojson|safe }};
+        let filteredItems = [...allItems];
+        let currentPage = 1;
+        const pageSize = 20;
+
+        function renderTable() {
+            const tbody = document.getElementById('tableBody');
+            tbody.innerHTML = '';
+            
+            const start = (currentPage - 1) * pageSize;
+            const end = start + pageSize;
+            const pageItems = filteredItems.slice(start, end);
+            const selectedYear = document.getElementById('yearFilter').value;
+
+            pageItems.forEach(item => {
+                let sr = item.total_sr;
+                let kk = item.total_kk;
+                
+                // If specific year selected, recalculate for that year only
+                if (selectedYear !== 'All') {
+                    const yearData = item.years_list.find(y => y.tahun == selectedYear);
+                    if (yearData) {
+                        sr = yearData.sr;
+                        kk = yearData.kk;
+                    } else {
+                        sr = 0;
+                        kk = 0;
+                    }
+                }
+
+                const rowPct = item.target > 0 ? (kk / item.target * 100) : 0;
+                const statusCls = rowPct < 30 ? "status-low" : (rowPct < 75 ? "status-med" : "status-high");
+                
+                const tr = document.createElement('tr');
+                tr.className = 'data-row';
+                tr.innerHTML = `
+                    <td><span class="badge">${item.kecamatan}</span></td>
+                    <td><strong>${item.desa}</strong></td>
+                    <td style="font-weight: 700;">${sr.toLocaleString()}</td>
+                    <td style="font-weight: 700;">${kk.toLocaleString()}</td>
+                    <td style="font-weight: 600; color: var(--accent);">${item.target.toLocaleString()}</td>
+                    <td>
+                        <span class="status-badge ${statusCls}">
+                            ${rowPct.toFixed(1)}%
+                        </span>
+                    </td>
+                    <td>
+                        <button class="btn-detail" 
+                                onclick='openDetail(${JSON.stringify(item)})'>Detail</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            renderPagination();
+        }
+
+        function renderPagination() {
+            const container = document.getElementById('pagination');
+            container.innerHTML = '';
+            const totalPages = Math.ceil(filteredItems.length / pageSize);
+
+            if (totalPages <= 1) return;
+
+            const addBtn = (label, page, isActive = false, isDisabled = false) => {
+                const btn = document.createElement('button');
+                btn.className = 'pagination-btn' + (isActive ? ' active' : '');
+                btn.innerText = label;
+                btn.disabled = isDisabled;
+                btn.onclick = () => { 
+                    if (!isDisabled && !isActive) {
+                        currentPage = page; 
+                        renderTable(); 
+                        window.scrollTo(0, 0); 
+                    }
+                };
+                container.appendChild(btn);
+            };
+
+            // First & Prev
+            addBtn('First', 1, false, currentPage === 1);
+            addBtn('Prev', currentPage - 1, false, currentPage === 1);
+
+            // Page numbers with Ellipsis
+            let start = Math.max(1, currentPage - 2);
+            let end = Math.min(totalPages, start + 4);
+            if (end - start < 4) start = Math.max(1, end - 4);
+
+            if (start > 1) {
+                addBtn('1', 1);
+                if (start > 2) {
+                    const span = document.createElement('span');
+                    span.innerText = '...';
+                    span.style.padding = '0 5px';
+                    container.appendChild(span);
+                }
+            }
+
+            for (let i = start; i <= end; i++) {
+                addBtn(i.toString(), i, i === currentPage);
+            }
+
+            if (end < totalPages) {
+                if (end < totalPages - 1) {
+                    const span = document.createElement('span');
+                    span.innerText = '...';
+                    span.style.padding = '0 5px';
+                    container.appendChild(span);
+                }
+                addBtn(totalPages.toString(), totalPages);
+            }
+
+            // Next & Last
+            addBtn('Next', currentPage + 1, false, currentPage === totalPages);
+            addBtn('Last', totalPages, false, currentPage === totalPages);
+            
+            // Info
+            const info = document.createElement('span');
+            info.style.fontSize = '0.8rem';
+            info.style.color = 'var(--text-muted)';
+            info.style.marginLeft = '1rem';
+            info.innerText = `Showing ${Math.min(filteredItems.length, (currentPage - 1) * pageSize + 1)} - ${Math.min(filteredItems.length, currentPage * pageSize)} of ${filteredItems.length}`;
+            container.appendChild(info);
+        }
+
+        function applyFilters() {
+            const search = document.getElementById('searchInput').value.toLowerCase();
+            const kec = document.getElementById('kecamatanFilter').value.toUpperCase();
+
+            filteredItems = allItems.filter(item => {
+                const matchSearch = item.desa.toLowerCase().includes(search);
+                const matchKec = kec === "" || item.kecamatan.toUpperCase() === kec;
+                return matchSearch && matchKec;
+            });
+
+            currentPage = 1;
+            renderTable();
+        }
+
+        // Initial render
+        renderTable();
+
+        function openDetail(item) {
+            document.getElementById('detailTitle').innerText = 'Breakdown: Desa ' + item.desa;
+            const body = document.getElementById('detailTableBody');
+            body.innerHTML = '';
+            
+            item.years_list.forEach(y => {
+                body.innerHTML += `
+                    <tr>
+                        <td><strong>${y.tahun}</strong></td>
+                        <td style="font-weight:700">${y.sr}</td>
+                        <td style="font-weight:700">${y.kk}</td>
+                        <td>${y.jiwa}</td>
+                        <td style="font-size: 0.7rem;">
+                            <strong>${y.meta.sumber_dana || '-'}</strong><br>
+                            <span style="color: var(--text-muted)">${y.meta.program || '-'}</span>
+                        </td>
+                        <td style="font-size: 0.7rem;">${y.meta.sistem_layanan || '-'}</td>
+                        <td style="font-size: 0.7rem;">
+                            Iuran: ${y.meta.iuran_nominal || '-'}<br>
+                            Ops: ${y.meta.biaya_operasional || '-'}
+                        </td>
+                        <td style="font-size: 0.7rem;">${y.meta.kepala || '-'}</td>
+                        <td>
+                            <button class="btn btn-primary" style="padding: 4px 8px; font-size: 0.7rem;" 
+                                onclick="openEdit('${y.id}', '${item.desa} (${y.tahun})', '${y.sr}', '${y.kk}', '${y.jiwa}')">Edit</button>
+                        </td>
+                    </tr>
+                `;
+            });
+            document.getElementById('detailModal').style.display = 'flex';
+        }
+
+        function openAddModal() {
+            document.getElementById('addModal').style.display = 'flex';
+        }
+
+        async function loadVillages(kec) {
+            const dropdown = document.getElementById('addDesaDropdown');
+            dropdown.innerHTML = '<option value="">Loading...</option>';
+            const res = await fetch('/api/desa/' + encodeURIComponent(kec));
+            const villages = await res.json();
+            dropdown.innerHTML = '<option value="">Pilih Desa...</option>';
+            villages.forEach(v => {
+                dropdown.innerHTML += `<option value="${v}">${v}</option>`;
+            });
+        }
+
+        function closeModal(id) {
+            if (id) {
+                document.getElementById(id).style.display = 'none';
+            } else {
+                // Fallback for older calls
+                document.getElementById('editModal').style.display = 'none';
+                document.getElementById('detailModal').style.display = 'none';
+                document.getElementById('addModal').style.display = 'none';
+            }
+        }
+
+        function openEdit(id, desa, sr, kk, jiwa) {
+            document.getElementById('modalTitle').innerText = 'Update ' + desa;
+            document.getElementById('updateForm').action = '/update/' + id;
+            document.getElementById('inputSR').value = sr;
+            document.getElementById('inputKK').value = kk;
+            document.getElementById('inputJiwa').value = jiwa;
+            document.getElementById('editModal').style.display = 'flex';
+        }
+
+        window.onclick = function (event) {
+            const editModal = document.getElementById('editModal');
+            const detailModal = document.getElementById('detailModal');
+            const addModal = document.getElementById('addModal');
+            if (event.target == editModal) closeModal('editModal');
+            if (event.target == detailModal) closeModal('detailModal');
+            if (event.target == addModal) closeModal('addModal');
+        }
+    </script>
+</body>
+
+</html>
