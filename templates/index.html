@@ -260,6 +260,10 @@
                 <span class="value">{{ "{:,}".format(total_kk) }}</span>
             </div>
             <div class="stat-card">
+                <span class="label">Total Jiwa Terlayani</span>
+                <span class="value">{{ "{:,}".format(total_kk * 5) }}</span>
+            </div>
+            <div class="stat-card">
                 <span class="label">Total Target Layanan</span>
                 <span class="value">{{ "{:,}".format(total_target) }}</span>
             </div>
@@ -294,6 +298,7 @@
                             <th>Desa</th>
                             <th class="col-sr">Total SR</th>
                             <th class="col-kk">Total KK</th>
+                            <th>Total Jiwa</th>
                             <th>Target</th>
                             <th>Capaian (%)</th>
                             <th>Action</th>
@@ -559,6 +564,7 @@
                     <td><strong>${item.desa}</strong></td>
                     <td style="font-weight: 700;">${sr.toLocaleString()}</td>
                     <td style="font-weight: 700;">${kk.toLocaleString()}</td>
+                    <td style="font-weight: 700; color: #6366f1;">${(kk * 5).toLocaleString()}</td>
                     <td style="font-weight: 600; color: var(--accent);">${item.target.toLocaleString()}</td>
                     <td>
                         <span class="status-badge ${statusCls}">

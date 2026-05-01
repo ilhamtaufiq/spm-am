@@ -177,6 +177,7 @@ async def add_data(
         tahun=tahun,
         jumlah_sr=jumlah_sr,
         jumlah_kk=jumlah_kk,
+        jumlah_jiwa=jumlah_kk * 5,  # Otomatis KK * 5
         target=target,
         sumber_dana="Update Manual",
         program="Update Manual"
@@ -223,7 +224,7 @@ async def update_item(
     if item:
         item.jumlah_sr = jumlah_sr
         item.jumlah_kk = jumlah_kk
-        item.jumlah_jiwa = jumlah_jiwa
+        item.jumlah_jiwa = jumlah_kk * 5  # Paksa KK * 5
         db.commit()
     return RedirectResponse(url="/", status_code=303)
 
