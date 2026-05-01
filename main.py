@@ -7,12 +7,27 @@ from sqlalchemy.orm import Session
 import models
 from models import SessionLocal, engine, Achievement
 import os
+import shutil
+
+# Database Seeding Logic
+DATABASE_PATH = "./data/spm_am.db"
+SEED_PATH = "./spm_am.db"
+
+if not os.path.exists("./data"):
+    os.makedirs("./data")
+
+# Jika file di folder data tidak ada atau ukurannya 0 (kosong), copy dari seed
+if not os.path.exists(DATABASE_PATH) or os.path.getsize(DATABASE_PATH) == 0:
+    if os.path.exists(SEED_PATH) and os.path.getsize(SEED_PATH) > 0:
+        print(f"Seeding database from {SEED_PATH} to {DATABASE_PATH}")
+        shutil.copy2(SEED_PATH, DATABASE_PATH)
 
 # Create tables
 models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI(title="SPM Air Minum Cianjur")
-app.add_middleware(SessionMiddleware, secret_key="spm-cianjur-secret-key-2026")
+# Gunakan secret key dari env jika ada
+app.add_middleware(SessionMiddleware, secret_key=os.getenv("SESSION_SECRET", "spm-cianjur-secret-key-2026"))
 
 # Static files
 app.mount("/static", StaticFiles(directory="static"), name="static")
