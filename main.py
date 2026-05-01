@@ -166,10 +166,11 @@ async def remi_update_score(request: Request, game_id: int, player_id: int = For
     current_score = player.total_score
     new_score = current_score + added_points
     
-    # Overtake Logic
+    # Overtake Logic: Hanya berlaku jika pemain yang disalip skornya > 100
     others = db.query(RemiPlayer).filter(RemiPlayer.game_id == game_id, RemiPlayer.id != player_id).all()
     for other in others:
-        if current_score < other.total_score <= new_score:
+        # Jika skor lawan > 100 DAN kita berhasil melewati skor dia
+        if other.total_score > 100 and current_score < other.total_score <= new_score:
             other.total_score = 0
             
     player.total_score = new_score
