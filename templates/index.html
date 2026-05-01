@@ -268,13 +268,21 @@
                 <span class="label">Total Jiwa Terlayani</span>
                 <span class="value">{{ "{:,}".format(total_kk * 5) }}</span>
             </div>
+            <div class="stat-card" style="background: #e0f2fe; border-color: #7dd3fc;">
+                <span class="label" style="color: #0369a1;">Total KK BJP (Realisasi)</span>
+                <span class="value" style="color: #0c4a6e;">{{ "{:,}".format(total_bjp_kk) }}</span>
+            </div>
+            <div class="stat-card" style="background: #f0f9ff; border-color: #bae6fd;">
+                <span class="label" style="color: #0369a1;">Total Jiwa BJP</span>
+                <span class="value" style="color: #0c4a6e;">{{ "{:,}".format(total_bjp_kk * 5) }}</span>
+            </div>
+            <div class="stat-card" style="background: #fef2f2; border-color: #fecaca;">
+                <span class="label" style="color: #991b1b;">Total Capaian (JP + BJP)</span>
+                <span class="value" style="color: #7f1d1d;">{{ "%.2f"|format(total_combined_percentage) }}%</span>
+            </div>
             <div class="stat-card">
                 <span class="label">Total Target Layanan</span>
                 <span class="value">{{ "{:,}".format(total_target) }}</span>
-            </div>
-            <div class="stat-card">
-                <span class="label">Capaian Layanan (%)</span>
-                <span class="value">{{ "%.2f"|format(total_percentage) }}%</span>
             </div>
         </div>
 
@@ -305,11 +313,14 @@
                         <tr>
                             <th>Kecamatan</th>
                             <th>Desa</th>
-                            <th class="col-sr">Total SR</th>
-                            <th class="col-kk">Total KK</th>
-                            <th>Total Jiwa</th>
+                            <th class="col-sr">Total SR (JP)</th>
+                            <th class="col-kk">Total KK (JP)</th>
+                            <th>Jiwa (JP)</th>
+                            <th style="background: #f0f9ff;">BJP (KK)</th>
+                            <th style="background: #f0f9ff;">BJP (Jiwa)</th>
+                            <th style="background: #f0f9ff;">BJP (%)</th>
                             <th>Target</th>
-                            <th>Capaian (%)</th>
+                            <th>Capaian JP (%)</th>
                             <th>Action</th>
                         </tr>
                     </thead>
@@ -482,6 +493,11 @@
                 const rowPct = item.target > 0 ? (kk / item.target * 100) : 0;
                 const statusCls = rowPct < 30 ? "status-low" : (rowPct < 75 ? "status-med" : "status-high");
 
+                const bjp_kk = item.bjp_kk || 0;
+                const bjp_jiwa = item.bjp_jiwa || 0;
+                const bjp_pct = item.target > 0 ? (bjp_kk / item.target * 100) : 0;
+                const bjpCls = bjp_pct < 10 ? "status-low" : (bjp_pct < 30 ? "status-med" : "status-high");
+
                 const tr = document.createElement('tr');
                 tr.className = 'data-row';
                 tr.innerHTML = `
@@ -490,6 +506,13 @@
                     <td style="font-weight: 700;">${sr.toLocaleString()}</td>
                     <td style="font-weight: 700;">${kk.toLocaleString()}</td>
                     <td style="font-weight: 700; color: #6366f1;">${(kk * 5).toLocaleString()}</td>
+                    <td style="font-weight: 700; background: #f0f9ff;">${bjp_kk.toLocaleString()}</td>
+                    <td style="font-weight: 700; background: #f0f9ff; color: #0369a1;">${bjp_jiwa.toLocaleString()}</td>
+                    <td style="background: #f0f9ff;">
+                        <span class="status-badge ${bjpCls}">
+                            ${bjp_pct.toFixed(1)}%
+                        </span>
+                    </td>
                     <td style="font-weight: 600; color: var(--accent);">${item.target.toLocaleString()}</td>
                     <td>
                         <span class="status-badge ${statusCls}">

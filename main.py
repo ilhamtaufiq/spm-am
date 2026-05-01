@@ -32,6 +32,22 @@ app.add_middleware(SessionMiddleware, secret_key=os.getenv("SESSION_SECRET", "sp
 app.mount("/static", StaticFiles(directory="static"), name="static")
 templates = Jinja2Templates(directory="templates")
 
+def load_bjp_data():
+    bjp_data = {}
+    if os.path.exists("semua_desa.md"):
+        with open("semua_desa.md", "r") as f:
+            for line in f:
+                parts = [p.strip() for p in line.split('\t') if p.strip()]
+                if len(parts) >= 3:
+                    kec = parts[0].upper()
+                    desa = parts[1].upper()
+                    try:
+                        kk = int(parts[2].replace(',', '').replace('.', ''))
+                        bjp_data[(kec, desa)] = kk
+                    except:
+                        pass
+    return bjp_data
+
 def get_current_user(request: Request):
     return request.session.get("user")
 
@@ -69,27 +85,53 @@ async def read_root(request: Request, db: Session = Depends(get_db)):
     if not get_current_user(request):
         return RedirectResponse(url="/login")
     
+    bjp_map = load_bjp_data()
     items_raw = db.query(Achievement).all()
     grouped = {}
     for item in items_raw:
-        key = (item.kecamatan, item.desa)
+        key = (item.kecamatan.upper(), item.desa.upper())
         if key not in grouped:
-            grouped[key] = {"kecamatan": item.kecamatan, "desa": item.desa, "target": item.target, "total_sr": 0, "total_kk": 0, "years_list": []}
+            # Get BJP KK for this village
+            bjp_kk = bjp_map.get(key, 0)
+            grouped[key] = {
+                "kecamatan": item.kecamatan, 
+                "desa": item.desa, 
+                "target": item.target, 
+                "total_sr": 0, "total_kk": 0, 
+                "bjp_kk": bjp_kk,
+                "bjp_jiwa": bjp_kk * 5,
+                "years_list": []
+            }
         grouped[key]["total_sr"] += (item.jumlah_sr or 0)
         grouped[key]["total_kk"] += (item.jumlah_kk or 0)
         grouped[key]["years_list"].append({"id": item.id, "tahun": item.tahun, "sr": item.jumlah_sr or 0, "kk": item.jumlah_kk or 0, "jiwa": item.jumlah_jiwa or 0})
         
     display_items = sorted(grouped.values(), key=lambda x: (x["kecamatan"], x["desa"]))
+    
+    # Calculate Totals
     total_sr = sum(item["total_sr"] for item in display_items)
     total_kk = sum(item["total_kk"] for item in display_items)
+    total_bjp_kk = sum(item["bjp_kk"] for item in display_items)
     total_target = sum(item["target"] for item in display_items)
+    
     total_percentage = (total_kk / total_target * 100) if total_target > 0 else 0
+    total_bjp_percentage = (total_bjp_kk / total_target * 100) if total_target > 0 else 0
+    total_combined_percentage = ((total_kk + total_bjp_kk) / total_target * 100) if total_target > 0 else 0
+    
     kecamatan_list = sorted(list(set([item.kecamatan for item in items_raw])))
     available_years = sorted(list(set([str(item.tahun) for item in items_raw])), reverse=True)
         
     return templates.TemplateResponse(request=request, name="index.html", context={
-        "items": display_items, "total_sr": total_sr, "total_kk": total_kk, "total_target": total_target,
-        "total_percentage": total_percentage, "kecamatan_list": kecamatan_list, "available_years": available_years
+        "items": display_items, 
+        "total_sr": total_sr, 
+        "total_kk": total_kk, 
+        "total_bjp_kk": total_bjp_kk,
+        "total_target": total_target,
+        "total_percentage": total_percentage, 
+        "total_bjp_percentage": total_bjp_percentage,
+        "total_combined_percentage": total_combined_percentage,
+        "kecamatan_list": kecamatan_list, 
+        "available_years": available_years
     })
 
 @app.post("/add")
