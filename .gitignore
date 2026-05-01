@@ -7,4 +7,4 @@ node_modules/
 *.sql
 scratch/
 .env
-data/*.db
+# data/*.db  <-- Saya buka blokirnya agar bisa sinkron
