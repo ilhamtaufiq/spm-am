@@ -102,10 +102,12 @@ async def read_root(request: Request, db: Session = Depends(get_db)):
                 "years_list": []
             }
         
-        bjp_kk_row = item.jumlah_bjp_kk or 0
+        # Fallback logic for BJP in each year row
+        bjp_kk_row = item.jumlah_bjp_kk if (item.jumlah_bjp_kk and item.jumlah_bjp_kk > 0) else bjp_map.get(key, 0)
+        
         grouped[key]["total_sr"] += (item.jumlah_sr or 0)
         grouped[key]["total_kk"] += (item.jumlah_kk or 0)
-        grouped[key]["total_bjp_kk"] += bjp_kk_row
+        grouped[key]["total_bjp_kk"] += (item.jumlah_bjp_kk or 0) # Real sum from DB
         grouped[key]["years_list"].append({
             "id": item.id, "tahun": item.tahun, 
             "sr": item.jumlah_sr or 0, "kk": item.jumlah_kk or 0, "jiwa": item.jumlah_jiwa or 0,
