@@ -25,15 +25,15 @@
         }
         .round-form-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-            gap: 2rem;
-            margin-top: 2rem;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+            margin-top: 1.5rem;
         }
         .round-input-group {
             background: rgba(255, 255, 255, 0.1);
-            padding: 1.5rem;
+            padding: 1rem;
             border: 3px solid #000;
-            border-radius: 20px;
+            border-radius: 15px;
         }
     </style>
 </head>
@@ -71,8 +71,8 @@
                 <div class="round-form-grid">
                     {% for player in players %}
                     <div class="round-input-group">
-                        <label style="color: white; font-weight: 900; display: block; margin-bottom: 0.8rem; text-transform: uppercase; font-size: 1.2rem;">{{ player.name }}</label>
-                        <input type="number" name="p_{{ player.id }}" placeholder="0" class="form-input" style="background: white; text-align: center; font-weight: 900; font-size: 2rem; width: 100%;">
+                        <label style="color: white; font-weight: 900; display: block; margin-bottom: 0.5rem; text-transform: uppercase; font-size: 1rem;">{{ player.name }}</label>
+                        <input type="number" name="p_{{ player.id }}" placeholder="0" class="form-input" style="background: white; text-align: center; font-weight: 900; font-size: 1.5rem; width: 100%;">
                     </div>
                     {% endfor %}
                 </div>
