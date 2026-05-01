@@ -4,33 +4,42 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Analisa RAB - Mission Control</title>
+    <title>Analisa RAB - AIR MINUM DAN SANITASI</title>
     <link rel="stylesheet" href="/static/style.css?v=1.3">
 </head>
 
 <body>
     <div class="container">
-        <div style="background: var(--white); border: var(--border-width) solid var(--black); border-radius: var(--radius); padding: 3rem; margin-bottom: 3rem; box-shadow: var(--shadow); display: flex; align-items: center; gap: 3rem; position: relative; overflow: hidden; animation: fadeIn 0.8s ease-out;">
+        <div
+            style="background: var(--white); border: var(--border-width) solid var(--black); border-radius: var(--radius); padding: 3rem; margin-bottom: 3rem; box-shadow: var(--shadow); display: flex; align-items: center; gap: 3rem; position: relative; overflow: hidden; animation: fadeIn 0.8s ease-out;">
             <div style="flex: 1; z-index: 2;">
                 <div style="display: flex; gap: 0.5rem; margin-bottom: 1rem;">
                     <span class="status-badge status-high" style="border: 2px solid #000;">ANALYSIS ENGINE</span>
-                    <span class="status-badge" style="background: #e0f2fe; color: #0369a1; border: 2px solid #000;">MULTIFILE ENABLED</span>
+                    <span class="status-badge"
+                        style="background: #e0f2fe; color: #0369a1; border: 2px solid #000;">MULTIFILE ENABLED</span>
                 </div>
-                <h1 style="font-size: 4.5rem; margin-bottom: 0.5rem; line-height: 0.85; color: var(--text);">RAB<br>ANALYZER</h1>
-                <p class="subtitle" style="font-size: 1.4rem; color: var(--text); margin-bottom: 2rem; font-weight: 600; opacity: 0.8;">Ekstraksi Data RAB Excel MCK <br>Secara Otomatis & Cerdas</p>
+                <h1 style="font-size: 4.5rem; margin-bottom: 0.5rem; line-height: 0.85; color: var(--text);">
+                    RAB<br>ANALYZER</h1>
+                <p class="subtitle"
+                    style="font-size: 1.4rem; color: var(--text); margin-bottom: 2rem; font-weight: 600; opacity: 0.8;">
+                    Ekstraksi Data RAB Excel MCK <br>Secara Otomatis & Cerdas</p>
                 <div style="display: flex; gap: 1.5rem;">
-                    <button class="btn" style="background: #ffffff; font-size: 1.1rem;" onclick="location.href='/'">BACK TO HUB</button>
-                    <button class="btn" style="background: var(--main); font-size: 1.1rem;" onclick="toggleTheme()">THEME MODE</button>
+                    <button class="btn" style="background: #ffffff; font-size: 1.1rem;" onclick="location.href='/'">BACK
+                        TO HUB</button>
+                    <button class="btn" style="background: var(--main); font-size: 1.1rem;"
+                        onclick="toggleTheme()">THEME MODE</button>
                 </div>
             </div>
             <div style="flex: 0 0 400px; position: relative; z-index: 1;">
-                <img src="/static/hero.png" alt="Hero" class="hero-img" style="width: 140%; height: auto; transform: rotate(5deg) scaleX(-1) translateX(20px);">
+                <img src="/static/hero.png" alt="Hero" class="hero-img"
+                    style="width: 140%; height: auto; transform: rotate(5deg) scaleX(-1) translateX(20px);">
             </div>
         </div>
 
         <div class="card stat-card" style="background: var(--accent); margin-bottom: 3rem; animation: none;">
             <h2 style="margin-bottom: 1.5rem; font-weight: 900; font-size: 2rem;">UPLOAD RAB FILES</h2>
-            <p style="margin-bottom: 2rem; font-weight: 600; font-size: 1.1rem;">Upload multiple Excel RAB (MCK) files to extract itemized work data instantly.</p>
+            <p style="margin-bottom: 2rem; font-weight: 600; font-size: 1.1rem;">Upload multiple Excel RAB (MCK) files
+                to extract itemized work data instantly.</p>
 
             <div style="display: flex; flex-direction: column; gap: 1.5rem;">
                 <div class="form-group">
@@ -38,14 +47,19 @@
                         style="background: white; width: 100%;" multiple required>
                 </div>
                 <button type="button" id="analyzeBtn" class="btn btn-primary"
-                    style="background: var(--main); width: fit-content; padding: 1.2rem 3rem; font-size: 1.1rem;" onclick="analyzeFiles()">START MULTI-FILE ANALYSIS</button>
+                    style="background: var(--main); width: fit-content; padding: 1.2rem 3rem; font-size: 1.1rem;"
+                    onclick="analyzeFiles()">START MULTI-FILE ANALYSIS</button>
             </div>
         </div>
 
-        <div id="resultsSection" class="card" style="display: none; margin-bottom: 3rem; animation: fadeIn 0.5s ease-out;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;">
-                <h2 style="font-weight: 900; font-size: 2rem;">EXTRACTION RESULTS (<span id="itemCount">0</span> ITEMS)</h2>
-                <button class="btn" style="background: #10b981; color: white; padding: 1rem 2rem;" onclick="downloadXlsx()">DOWNLOAD EXCEL (.XLSX)</button>
+        <div id="resultsSection" class="card"
+            style="display: none; margin-bottom: 3rem; animation: fadeIn 0.5s ease-out;">
+            <div
+                style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;">
+                <h2 style="font-weight: 900; font-size: 2rem;">EXTRACTION RESULTS (<span id="itemCount">0</span> ITEMS)
+                </h2>
+                <button class="btn" style="background: #10b981; color: white; padding: 1rem 2rem;"
+                    onclick="downloadXlsx()">DOWNLOAD EXCEL (.XLSX)</button>
             </div>
 
             <div class="table-container">
