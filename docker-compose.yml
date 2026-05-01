@@ -12,6 +12,8 @@ services:
     environment:
       - SESSION_SECRET=spm-cianjur-super-secret-key-2026
       - DATABASE_URL=sqlite:///./data/spm_am.db
+    labels:
+      - "coolify.port=80"
     restart: always
 
 volumes:
