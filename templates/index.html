@@ -208,35 +208,6 @@
             <button class="btn btn-primary" onclick="toggleTheme()">Toggle Theme</button>
         </header>
 
-        <!-- New Hierarchical Update Form -->
-        <div class="card" style="margin-bottom: 2rem;">
-            <h3 style="margin-bottom: 1.5rem; font-size: 1.125rem;">Quick Update Capaian</h3>
-            <form id="quickUpdateForm" class="quick-form">
-                <div class="form-group" style="margin-bottom: 0;">
-                    <label style="font-size: 0.75rem; font-weight: 600; color: var(--text-muted); margin-bottom: 4px; display: block;">Kecamatan</label>
-                    <select id="selectKecamatan" class="form-select" required>
-                        <option value="">Pilih Kecamatan</option>
-                    </select>
-                </div>
-                <div class="form-group" style="margin-bottom: 0;">
-                    <label style="font-size: 0.75rem; font-weight: 600; color: var(--text-muted); margin-bottom: 4px; display: block;">Desa</label>
-                    <select id="selectDesa" class="form-select" required disabled>
-                        <option value="">Pilih Desa</option>
-                    </select>
-                </div>
-                <div class="form-group" style="margin-bottom: 0;">
-                    <label style="font-size: 0.75rem; font-weight: 600; color: var(--text-muted); margin-bottom: 4px; display: block;">Tahun</label>
-                    <select id="selectTahun" class="form-select" required disabled>
-                        <option value="">Pilih Tahun</option>
-                    </select>
-                </div>
-                <div class="form-group" style="margin-bottom: 0;">
-                    <label style="font-size: 0.75rem; font-weight: 600; color: var(--text-muted); margin-bottom: 4px; display: block;">Jumlah SR</label>
-                    <input type="number" step="1" id="inputQuickSR" class="form-input" placeholder="0" required>
-                </div>
-                <button type="submit" class="btn btn-primary" style="height: 42px; justify-content: center;">Update Data</button>
-            </form>
-        </div>
 
         <div class="header" style="display: flex; justify-content: space-between; align-items: center;">
             <div>
@@ -417,91 +388,6 @@
     </div>
 
     <script>
-        // Hierarchical Selection Logic
-        const selectKecamatan = document.getElementById('selectKecamatan');
-        const selectDesa = document.getElementById('selectDesa');
-        const selectTahun = document.getElementById('selectTahun');
-        const quickUpdateForm = document.getElementById('quickUpdateForm');
-
-        // Load Kecamatan on page load
-        fetch('/api/kecamatan')
-            .then(res => res.json())
-            .then(data => {
-                data.sort().forEach(kec => {
-                    const opt = document.createElement('option');
-                    opt.value = kec;
-                    opt.innerText = kec;
-                    selectKecamatan.appendChild(opt);
-                });
-            });
-
-        selectKecamatan.addEventListener('change', () => {
-            const kec = selectKecamatan.value;
-            selectDesa.innerHTML = '<option value="">Pilih Desa</option>';
-            selectTahun.innerHTML = '<option value="">Pilih Tahun</option>';
-            selectTahun.disabled = true;
-
-            if (kec) {
-                fetch(`/api/desa/${kec}`)
-                    .then(res => res.json())
-                    .then(data => {
-                        data.sort().forEach(desa => {
-                            const opt = document.createElement('option');
-                            opt.value = desa;
-                            opt.innerText = desa;
-                            selectDesa.appendChild(opt);
-                        });
-                        selectDesa.disabled = false;
-                    });
-            } else {
-                selectDesa.disabled = true;
-            }
-        });
-
-        selectDesa.addEventListener('change', () => {
-            const kec = selectKecamatan.value;
-            const desa = selectDesa.value;
-            selectTahun.innerHTML = '<option value="">Pilih Tahun</option>';
-
-            if (desa) {
-                fetch(`/api/tahun/${kec}/${desa}`)
-                    .then(res => res.json())
-                    .then(data => {
-                        data.sort().forEach(tahun => {
-                            const opt = document.createElement('option');
-                            opt.value = tahun;
-                            opt.innerText = tahun;
-                            selectTahun.appendChild(opt);
-                        });
-                        selectTahun.disabled = false;
-                    });
-            } else {
-                selectTahun.disabled = true;
-            }
-        });
-
-        quickUpdateForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-            const formData = new FormData();
-            formData.append('kecamatan', selectKecamatan.value);
-            formData.append('desa', selectDesa.value);
-            formData.append('tahun', selectTahun.value);
-            formData.append('jumlah_sr', document.getElementById('inputQuickSR').value);
-
-            fetch('/api/update-v2', {
-                method: 'POST',
-                body: formData
-            })
-                .then(res => res.json())
-                .then(data => {
-                    if (data.status === 'success') {
-                        alert('Data berhasil diperbarui!');
-                        window.location.reload();
-                    } else {
-                        alert('Error: ' + data.message);
-                    }
-                });
-        });
 
         function toggleTheme() {
             const body = document.body;
