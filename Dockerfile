@@ -13,9 +13,10 @@ ENV PORT=80
 
 WORKDIR /app
 
-# Install system dependencies
+# Install system dependencies (hanya yang benar-benar perlu)
+# Jika nanti butuh library C, baru kita tambahkan satu-persatu
 RUN apt-get update && apt-get install -y \
-    build-essential \
+    curl \
     && rm -rf /var/lib/apt/lists/*
 
 # Install Python dependencies
