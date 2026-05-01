@@ -209,33 +209,32 @@
         </header>
 
         <!-- New Hierarchical Update Form -->
-        <div class="card" style="margin-bottom: 2rem; padding: 1.5rem;">
-            <h3 style="margin-bottom: 1rem; font-size: 1.125rem;">Quick Update Capaian</h3>
-            <form id="quickUpdateForm"
-                style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; align-items: end;">
+        <div class="card" style="margin-bottom: 2rem;">
+            <h3 style="margin-bottom: 1.5rem; font-size: 1.125rem;">Quick Update Capaian</h3>
+            <form id="quickUpdateForm" class="quick-form">
                 <div class="form-group" style="margin-bottom: 0;">
-                    <label>Kecamatan</label>
+                    <label style="font-size: 0.75rem; font-weight: 600; color: var(--text-muted); margin-bottom: 4px; display: block;">Kecamatan</label>
                     <select id="selectKecamatan" class="form-select" required>
                         <option value="">Pilih Kecamatan</option>
                     </select>
                 </div>
                 <div class="form-group" style="margin-bottom: 0;">
-                    <label>Desa</label>
+                    <label style="font-size: 0.75rem; font-weight: 600; color: var(--text-muted); margin-bottom: 4px; display: block;">Desa</label>
                     <select id="selectDesa" class="form-select" required disabled>
                         <option value="">Pilih Desa</option>
                     </select>
                 </div>
                 <div class="form-group" style="margin-bottom: 0;">
-                    <label>Tahun</label>
+                    <label style="font-size: 0.75rem; font-weight: 600; color: var(--text-muted); margin-bottom: 4px; display: block;">Tahun</label>
                     <select id="selectTahun" class="form-select" required disabled>
                         <option value="">Pilih Tahun</option>
                     </select>
                 </div>
                 <div class="form-group" style="margin-bottom: 0;">
-                    <label>Jumlah SR</label>
-                    <input type="number" step="1" id="inputQuickSR" placeholder="0" required>
+                    <label style="font-size: 0.75rem; font-weight: 600; color: var(--text-muted); margin-bottom: 4px; display: block;">Jumlah SR</label>
+                    <input type="number" step="1" id="inputQuickSR" class="form-input" placeholder="0" required>
                 </div>
-                <button type="submit" class="btn btn-primary" style="height: 42px;">Update Data</button>
+                <button type="submit" class="btn btn-primary" style="height: 42px; justify-content: center;">Update Data</button>
             </form>
         </div>
 
@@ -274,16 +273,16 @@
         </div>
 
         <div class="card">
-            <div class="filter-bar">
-                <input type="text" id="searchInput" class="filter-input" placeholder="Cari Desa..." onkeyup="applyFilters()">
-                <select id="kecamatanFilter" class="filter-input" onchange="applyFilters()">
+            <div class="filter-bar" style="display: grid; grid-template-columns: 1fr auto auto; gap: 1rem; margin-bottom: 1.5rem;">
+                <input type="text" id="searchInput" class="form-input" placeholder="Cari Desa..." onkeyup="applyFilters()">
+                <select id="kecamatanFilter" class="form-select" style="width: auto; min-width: 180px;" onchange="applyFilters()">
                     <option value="">Semua Kecamatan</option>
                     {% for kec in kecamatan_list %}
                     <option value="{{ kec }}">{{ kec }}</option>
                     {% endfor %}
                 </select>
-                <select id="yearFilter" class="filter-input" onchange="applyFilters()">
-                    <option value="All">Semua Tahun (Akumulasi)</option>
+                <select id="yearFilter" class="form-select" style="width: auto; min-width: 150px;" onchange="applyFilters()">
+                    <option value="All">Semua Tahun</option>
                     {% for yr in available_years %}
                     <option value="{{ yr }}">Tahun {{ yr }}</option>
                     {% endfor %}
