@@ -420,25 +420,62 @@
         <div class="modal">
             <h2 id="modalTitle" style="margin-bottom: 1.5rem;">Update Data</h2>
             <form id="updateForm" method="POST">
-                <div class="form-group">
-                    <label>Jumlah SR (Unit)</label>
-                    <input type="number" step="1" name="jumlah_sr" id="inputSR" required>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                    <div class="form-group">
+                        <label>Jumlah SR (Unit)</label>
+                        <input type="number" step="1" name="jumlah_sr" id="inputSR" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Jumlah KK (JP)</label>
+                        <input type="number" step="1" name="jumlah_kk" id="inputKK" required>
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label>Jumlah KK (JP)</label>
-                    <input type="number" step="1" name="jumlah_kk" id="inputKK" required>
-                </div>
+                
                 <div class="form-group" style="background: #f0f9ff; padding: 10px; border-radius: 8px; border: 1px solid #7dd3fc;">
                     <label style="color: #0369a1; font-weight: 600;">Jumlah KK (BJP)</label>
                     <input type="number" step="1" name="jumlah_bjp_kk" id="inputBJPKK" required>
                 </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                    <div class="form-group">
+                        <label>Sistem Layanan</label>
+                        <input type="text" name="sistem_layanan" id="inputSistem">
+                    </div>
+                    <div class="form-group">
+                        <label>Pengelola (Kepala)</label>
+                        <input type="text" name="kepala" id="inputKepala">
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                    <div class="form-group">
+                        <label>Iuran Nominal</label>
+                        <input type="text" name="iuran_nominal" id="inputIuran">
+                    </div>
+                    <div class="form-group">
+                        <label>Biaya Ops</label>
+                        <input type="text" name="biaya_operasional" id="inputOps">
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                    <div class="form-group">
+                        <label>Sumber Dana</label>
+                        <input type="text" name="sumber_dana" id="inputDana">
+                    </div>
+                    <div class="form-group">
+                        <label>Program</label>
+                        <input type="text" name="program" id="inputProgram">
+                    </div>
+                </div>
+
                 <div class="form-group" style="display:none;">
                     <label>Jumlah Jiwa (JP)</label>
                     <input type="number" step="1" name="jumlah_jiwa" id="inputJiwa">
                 </div>
-                <div style="display: flex; gap: 1rem; justify-content: flex-end;">
-                    <button type="button" class="btn" style="background: var(--border);"
-                        onclick="closeModal()">Cancel</button>
+                <div style="display: flex; gap: 1rem; justify-content: flex-end; margin-top: 1rem;">
+                    <button type="button" class="btn" style="background: #f1f5f9; box-shadow: 4px 4px 0px 0px #000;"
+                        onclick="closeModal('editModal')">Cancel</button>
                     <button type="submit" class="btn btn-primary">Save Changes</button>
                 </div>
             </form>
@@ -642,7 +679,7 @@
                         <td style="font-size: 0.7rem;">${y.meta.kepala || '-'}</td>
                         <td>
                             <button class="btn btn-primary" style="padding: 4px 8px; font-size: 0.7rem;" 
-                                onclick="openEdit('${y.id}', '${item.desa} (${y.tahun})', '${y.sr}', '${y.kk}', '${y.jiwa}', '${y.bjp_kk || 0}')">Edit</button>
+                                onclick="openEdit('${y.id}', '${item.desa} (${y.tahun})', '${y.sr}', '${y.kk}', '${y.jiwa}', '${y.bjp_kk || 0}', '${y.meta.sistem_layanan || ''}', '${y.meta.kepala || ''}', '${y.meta.iuran_nominal || ''}', '${y.meta.biaya_operasional || ''}', '${y.meta.sumber_dana || ''}', '${y.meta.program || ''}')">Edit</button>
                         </td>
                     </tr>
                 `;
@@ -677,13 +714,19 @@
             }
         }
 
-        function openEdit(id, desa, sr, kk, jiwa, bjp_kk) {
+        function openEdit(id, desa, sr, kk, jiwa, bjp_kk, sistem, kepala, iuran, ops, dana, program) {
             document.getElementById('modalTitle').innerText = 'Update ' + desa;
             document.getElementById('updateForm').action = '/update/' + id;
             document.getElementById('inputSR').value = sr;
             document.getElementById('inputKK').value = kk;
             document.getElementById('inputJiwa').value = jiwa;
             document.getElementById('inputBJPKK').value = bjp_kk || 0;
+            document.getElementById('inputSistem').value = sistem || '';
+            document.getElementById('inputKepala').value = kepala || '';
+            document.getElementById('inputIuran').value = iuran || '';
+            document.getElementById('inputOps').value = ops || '';
+            document.getElementById('inputDana').value = dana || '';
+            document.getElementById('inputProgram').value = program || '';
             document.getElementById('editModal').style.display = 'flex';
         }
 

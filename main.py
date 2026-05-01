@@ -156,7 +156,22 @@ async def read_root(request: Request, db: Session = Depends(get_db)):
     })
 
 @app.post("/add")
-async def add_data(request: Request, kecamatan: str = Form(...), desa: str = Form(...), tahun: str = Form(...), jumlah_sr: int = Form(...), jumlah_kk: int = Form(...), jumlah_bjp_kk: int = Form(0), db: Session = Depends(get_db)):
+async def add_data(
+    request: Request, 
+    kecamatan: str = Form(...), 
+    desa: str = Form(...), 
+    tahun: str = Form(...), 
+    jumlah_sr: int = Form(...), 
+    jumlah_kk: int = Form(...), 
+    jumlah_bjp_kk: int = Form(0),
+    sumber_dana: str = Form("Manual"),
+    program: str = Form("Manual"),
+    sistem_layanan: str = Form(None),
+    kepala: str = Form(None),
+    iuran_nominal: str = Form(None),
+    biaya_operasional: str = Form(None),
+    db: Session = Depends(get_db)
+):
     if not get_current_user(request): return RedirectResponse(url="/login", status_code=302)
     existing = db.query(Achievement).filter(Achievement.desa == desa).first()
     target = existing.target if existing else 0
@@ -164,14 +179,29 @@ async def add_data(request: Request, kecamatan: str = Form(...), desa: str = For
         kecamatan=kecamatan, desa=desa, tahun=tahun, 
         jumlah_sr=jumlah_sr, jumlah_kk=jumlah_kk, jumlah_jiwa=jumlah_kk*5, 
         jumlah_bjp_kk=jumlah_bjp_kk, jumlah_bjp_jiwa=jumlah_bjp_kk*5,
-        target=target, sumber_dana="Update Manual", program="Update Manual"
+        target=target, sumber_dana=sumber_dana, program=program,
+        sistem_layanan=sistem_layanan, kepala=kepala,
+        iuran_nominal=iuran_nominal, biaya_operasional=biaya_operasional
     )
     db.add(new_item)
     db.commit()
     return RedirectResponse(url="/spm", status_code=303)
 
 @app.post("/update/{item_id}")
-async def update_item(request: Request, item_id: int, jumlah_sr: int = Form(...), jumlah_kk: int = Form(...), jumlah_bjp_kk: int = Form(0), db: Session = Depends(get_db)):
+async def update_item(
+    request: Request, 
+    item_id: int, 
+    jumlah_sr: int = Form(...), 
+    jumlah_kk: int = Form(...), 
+    jumlah_bjp_kk: int = Form(0), 
+    sistem_layanan: str = Form(None),
+    kepala: str = Form(None),
+    iuran_nominal: str = Form(None),
+    biaya_operasional: str = Form(None),
+    sumber_dana: str = Form(None),
+    program: str = Form(None),
+    db: Session = Depends(get_db)
+):
     if not get_current_user(request): return RedirectResponse(url="/login", status_code=302)
     item = db.query(Achievement).filter(Achievement.id == item_id).first()
     if item:
@@ -180,6 +210,12 @@ async def update_item(request: Request, item_id: int, jumlah_sr: int = Form(...)
         item.jumlah_jiwa = jumlah_kk * 5
         item.jumlah_bjp_kk = jumlah_bjp_kk
         item.jumlah_bjp_jiwa = jumlah_bjp_kk * 5
+        item.sistem_layanan = sistem_layanan
+        item.kepala = kepala
+        item.iuran_nominal = iuran_nominal
+        item.biaya_operasional = biaya_operasional
+        item.sumber_dana = sumber_dana
+        item.program = program
         db.commit()
     return RedirectResponse(url="/spm", status_code=303)
 
