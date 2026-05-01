@@ -5,3 +5,4 @@ sqlalchemy
 python-multipart
 starlette
 itsdangerous
+openpyxl

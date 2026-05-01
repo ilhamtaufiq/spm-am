@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cianjur Tool Hub</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;900&display=swap" rel="stylesheet">
+    <style>
+        .service-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2.5rem;
+            margin-top: 4rem;
+        }
+        .service-card {
+            text-decoration: none;
+            color: inherit;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+        }
+        .service-card:hover {
+            transform: translate(-4px, -4px);
+            box-shadow: 10px 10px 0px 0px #000;
+        }
+        .icon-box {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+        }
+        .service-card h2 {
+            font-size: 2rem;
+            font-weight: 900;
+            text-transform: uppercase;
+        }
+        .service-card p {
+            font-weight: 600;
+            opacity: 0.8;
+        }
+        .badge-new {
+            position: absolute;
+            top: -15px;
+            right: -15px;
+            background: #ff5c5c;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 99px;
+            font-weight: 900;
+            border: 3px solid #000;
+            transform: rotate(15deg);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div>
+                <h1>CIANJUR HUB</h1>
+                <div class="subtitle">PORTAL TOOLS TEKNIS KABUPATEN CIANJUR</div>
+            </div>
+            <div>
+                <button class="btn" style="background: #f87171;" onclick="location.href='/logout'">LOGOUT</button>
+            </div>
+        </header>
+
+        <div class="service-grid">
+            <a href="/spm" class="service-card card" style="background: var(--main);">
+                <div class="icon-box">🚰</div>
+                <h2>Dashboard SPM JP</h2>
+                <p>Monitoring capaian Sambungan Rumah (SR) Jaringan Pipa per desa di Kabupaten Cianjur.</p>
+            </a>
+
+            <a href="/rab" class="service-card card" style="background: var(--accent);">
+                <span class="badge-new">NEW</span>
+                <div class="icon-box">📊</div>
+                <h2>Analisa RAB</h2>
+                <p>Ekstraksi dan standarisasi data RAB dari Excel MCK ke format yang siap diolah.</p>
+            </a>
+        </div>
+    </div>
+</body>
+</html>

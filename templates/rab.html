@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analisa RAB - Cianjur Hub</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;900&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div>
+                <a href="/" style="text-decoration: none; color: inherit;"><h1>ANALISA RAB</h1></a>
+                <div class="subtitle">EKSTRAKSI DATA RAB EXCEL MCK</div>
+            </div>
+            <div style="display: flex; gap: 1rem;">
+                <a href="/" class="btn" style="background: white;">KEMBALI KE HUB</a>
+                <a href="/logout" class="btn" style="background: #f87171;">LOGOUT</a>
+            </div>
+        </header>
+
+        <div class="card" style="background: var(--accent); margin-bottom: 3rem;">
+            <h2 style="margin-bottom: 1.5rem; font-weight: 900;">UPLOAD FILE RAB</h2>
+            <p style="margin-bottom: 2rem; font-weight: 600;">Silakan upload file Excel RAB (MCK) untuk diekstrak item pekerjaannya secara otomatis.</p>
+            
+            <form action="/rab/analyze" method="post" enctype="multipart/form-data" style="display: flex; flex-direction: column; gap: 1.5rem;">
+                <div class="form-group">
+                    <input type="file" name="file" accept=".xlsx" class="form-input" style="background: white;" required>
+                </div>
+                <button type="submit" class="btn btn-primary" style="background: var(--main); width: fit-content;">MULAI ANALISA & DOWNLOAD</button>
+            </form>
+        </div>
+
+        <div class="card">
+            <h3 style="margin-bottom: 1rem; font-weight: 900;">PANDUAN PENGGUNAAN</h3>
+            <ul style="padding-left: 1.5rem; font-weight: 600; line-height: 2;">
+                <li>Gunakan template RAB standar (MCK).</li>
+                <li>Pastikan data berada di Sheet bernama "RAB".</li>
+                <li>Sistem akan mulai membaca dari baris ke-77.</li>
+                <li>Baris yang tersembunyi (Hidden) akan otomatis dilewati.</li>
+                <li>Hasil ekstraksi akan langsung didownload dalam format .xlsx standar.</li>
+            </ul>
+        </div>
+    </div>
+</body>
+</html>
