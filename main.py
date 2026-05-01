@@ -181,6 +181,36 @@ async def remi_update_score(request: Request, game_id: int, player_id: int = For
     db.commit()
     return RedirectResponse(url=f"/remi/{game_id}", status_code=303)
 
+@app.post("/remi/{game_id}/round")
+async def remi_update_round(request: Request, game_id: int, db: Session = Depends(get_db)):
+    if not get_current_user(request): return RedirectResponse(url="/login")
+    game = db.query(RemiGame).filter(RemiGame.id == game_id).first()
+    if not game or not game.is_active: return RedirectResponse(url=f"/remi/{game_id}")
+    
+    form_data = await request.form()
+    players = db.query(RemiPlayer).filter(RemiPlayer.game_id == game_id).all()
+    
+    for player in players:
+        added_points = int(form_data.get(f"p_{player.id}") or 0)
+        if added_points == 0: continue
+        
+        current_score = player.total_score
+        new_score = current_score + added_points
+        
+        # Overtake Logic: Berlaku per individu saat skornya diupdate
+        others = db.query(RemiPlayer).filter(RemiPlayer.game_id == game_id, RemiPlayer.id != player.id).all()
+        for other in others:
+            if other.total_score > 100 and current_score < other.total_score <= new_score:
+                other.total_score = 0
+                
+        player.total_score = new_score
+        if player.total_score >= 1000:
+            game.is_active = 0
+            game.winner_name = player.name
+            
+    db.commit()
+    return RedirectResponse(url=f"/remi/{game_id}", status_code=303)
+
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
