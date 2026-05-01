@@ -1,8 +1,10 @@
 services:
   app:
     build: .
-    ports:
-      - "80:80"
+    # Ports removed to avoid conflict with Coolify Proxy. 
+    # Coolify will automatically proxy to the internal port 80.
+    expose:
+      - 80
     volumes:
       - ./data:/app/data
       - ./static:/app/static
