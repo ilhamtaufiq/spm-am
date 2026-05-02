@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Game #{{ game.id }} - Remi Counter</title>
+    <title>Game #{{ game.id }} - Remi CUP</title>
     <link rel="stylesheet" href="/static/style.css?v=1.3">
     <style>
         .player-grid {
@@ -12,25 +13,29 @@
             gap: 2rem;
             margin-bottom: 3rem;
         }
+
         .player-card {
             text-align: center;
             padding: 3rem 1.5rem;
             position: relative;
             animation: floating 3s ease-in-out infinite;
         }
+
         .player-card .score {
             font-size: 5rem;
             font-weight: 900;
             margin-top: 1rem;
             line-height: 1;
-            filter: drop-shadow(4px 4px 0px rgba(0,0,0,0.1));
+            filter: drop-shadow(4px 4px 0px rgba(0, 0, 0, 0.1));
         }
+
         .round-form-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
             gap: 1.5rem;
             margin-top: 2rem;
         }
+
         .round-input-group {
             background: rgba(255, 255, 255, 0.1);
             padding: 1.5rem;
@@ -38,76 +43,82 @@
             border-radius: 20px;
             transition: transform 0.2s;
         }
+
         .round-input-group:focus-within {
             transform: scale(1.05);
             background: rgba(255, 255, 255, 0.2);
         }
     </style>
 </head>
+
 <body>
     <div class="container">
-        <div style="background: var(--white); border: var(--border-width) solid var(--black); border-radius: var(--radius); padding: 3rem; margin-bottom: 3rem; box-shadow: var(--shadow); display: flex; align-items: center; gap: 3rem; position: relative; overflow: hidden; animation: fadeIn 0.8s ease-out;">
-            <div style="flex: 1; z-index: 2;">
-                <div style="display: flex; gap: 0.5rem; margin-bottom: 1rem;">
-                    <span class="status-badge status-high" style="border: 2px solid #000;">GAME SESSION ACTIVE</span>
-                    <span class="status-badge" style="background: #e0f2fe; color: #0369a1; border: 2px solid #000;">ID: #{{ game.id }}</span>
-                </div>
-                <h1 style="font-size: 4.5rem; margin-bottom: 0.5rem; line-height: 0.85; color: var(--text);">GAME<br>ARENA</h1>
-                <p class="subtitle" style="font-size: 1.4rem; color: var(--text); margin-bottom: 2rem; font-weight: 600; opacity: 0.8;">Started: {{ game.created_at }} <br>Target: 1000 Points</p>
-                <div style="display: flex; gap: 1.5rem;">
-                    <button class="btn" style="background: #ffffff; font-size: 1.1rem;" onclick="location.href='/remi'">BACK TO LOBBY</button>
-                    <button class="btn" style="background: var(--main); font-size: 1.1rem;" onclick="toggleTheme()">THEME MODE</button>
-                </div>
-            </div>
-            <div style="flex: 0 0 400px; position: relative; z-index: 1;">
-                <img src="/static/hero.png" alt="Hero" class="hero-img" style="width: 140%; height: auto; transform: rotate(10deg) translateX(20px);">
-            </div>
-        </div>
+        {% set title = "ARENA<br>TEMPUR" %}
+        {% set subtitle = "Mulai: " ~ game.created_at ~ " <br>Target: 1000 Poin" %}
+        {% set badge1 = "LAGI MAIN BOS" %}
+        {% set badge2 = "ID: #" ~ game.id %}
+        {% set show_back = true %}
+        {% set back_url = "/remi" %}
+        {% set back_text = "BALIK KE LOBBY" %}
+        {% include 'header_component.html' %}
 
         {% if not game.is_active %}
-        <div class="card stat-card" style="background: #10b981; border-color: #000; margin-bottom: 3rem; text-align: center; padding: 4rem 2rem;">
+        <div class="card stat-card"
+            style="background: #10b981; border-color: #000; margin-bottom: 3rem; text-align: center; padding: 4rem 2rem;">
             <div style="font-size: 6rem; margin-bottom: 1rem;">🏆</div>
-            <h1 style="color: white; font-weight: 900; font-size: 4rem; text-transform: uppercase; line-height: 1;">WINNER:<br>{{ game.winner_name }}</h1>
-            <p style="color: white; font-weight: 900; font-size: 1.5rem; margin-top: 2rem; opacity: 0.9;">CONGRATULATIONS CHAMPION!</p>
-            <button class="btn" style="margin-top: 3rem; background: white; color: #10b981; font-size: 1.5rem; padding: 1.2rem 4rem;" onclick="location.href='/remi'">PLAY AGAIN</button>
+            <h1 style="color: white; font-weight: 900; font-size: 4rem; text-transform: uppercase; line-height: 1;">
+                PEMENANGNYA:<br>{{ game.winner_name }}</h1>
+            <p style="color: white; font-weight: 900; font-size: 1.5rem; margin-top: 2rem; opacity: 0.9;">
+                SELAMAT YA CHAMPION! GOKIL ENTE! </p>
+            <button class="btn"
+                style="margin-top: 3rem; background: white; color: #10b981; font-size: 1.5rem; padding: 1.2rem 4rem;"
+                onclick="location.href='/remi'">MAIN LAGI KUY</button>
         </div>
         {% endif %}
 
         <div class="player-grid">
             {% for player in players %}
-            <div class="card player-card stat-card" style="background: {{ ['#d8b4fe', '#fcd34d', '#60a5fa', '#fda4af'][loop.index0] }}; animation-delay: {{ loop.index0 * 0.2 }}s;">
-                <h3 style="font-weight: 900; text-transform: uppercase; font-size: 1.5rem; opacity: 0.8;">{{ player.name }}</h3>
+            <div class="card player-card stat-card"
+                style="background: {{ ['#d8b4fe', '#fcd34d', '#60a5fa', '#fda4af'][loop.index0] }}; animation-delay: {{ loop.index0 * 0.2 }}s;">
+                <h3 style="font-weight: 900; text-transform: uppercase; font-size: 1.5rem; opacity: 0.8;">{{ player.name
+                    }}</h3>
                 <div class="score">{{ player.total_score }}</div>
-                <div style="font-weight: 900; margin-top: 1rem; letter-spacing: 2px;">POINTS</div>
+                <div style="font-weight: 900; margin-top: 1rem; letter-spacing: 2px;">POIN</div>
             </div>
             {% endfor %}
         </div>
 
         {% if game.is_active %}
         <div class="card" style="background: #6366f1; border-color: #000; padding: 3rem;">
-            <h2 style="font-weight: 900; color: white; margin-bottom: 0.5rem; font-size: 2.5rem;">ROUND INPUT</h2>
-            <p style="color: white; font-weight: 600; opacity: 0.9; font-size: 1.2rem;">Enter points gained or lost for each player this round.</p>
-            
+            <h2 style="font-weight: 900; color: white; margin-bottom: 0.5rem; font-size: 2.5rem;">INPUT SKOR</h2>
+            <p style="color: white; font-weight: 600; opacity: 0.9; font-size: 1.2rem;">Masukin poin yang didapet (atau minus) tiap pemain di ronde ini.</p>
+
             <form action="/remi/{{ game.id }}/round" method="post">
                 <div class="round-form-grid">
                     {% for player in players %}
                     <div class="round-input-group">
-                        <label style="color: white; font-weight: 900; display: block; margin-bottom: 1rem; text-transform: uppercase; font-size: 1.1rem; text-align: center;">{{ player.name }}</label>
-                        <input type="number" name="p_{{ player.id }}" placeholder="0" class="form-input" style="background: white; text-align: center; font-weight: 900; font-size: 2rem; width: 100%; padding: 1rem; border-radius: 12px;">
+                        <label
+                            style="color: white; font-weight: 900; display: block; margin-bottom: 1rem; text-transform: uppercase; font-size: 1.1rem; text-align: center;">{{
+                            player.name }}</label>
+                        <input type="number" name="p_{{ player.id }}" placeholder="0" class="form-input"
+                            style="background: white; text-align: center; font-weight: 900; font-size: 2rem; width: 100%; padding: 1rem; border-radius: 12px;">
                     </div>
                     {% endfor %}
                 </div>
-                <button type="submit" class="btn btn-primary" style="margin-top: 3rem; width: 100%; font-size: 2rem; background: #000; color: #fff; padding: 2rem; border-radius: 20px;">SUBMIT ROUND SCORES 🃏</button>
+                <button type="submit" class="btn btn-primary"
+                    style="margin-top: 3rem; width: 100%; font-size: 2rem; background: #000; color: #fff; padding: 2rem; border-radius: 20px;">GAS INPUT SKOR! 🃏</button>
             </form>
         </div>
         {% endif %}
 
         <div class="card" style="background: var(--white); border-style: dashed; margin-top: 3rem;">
-            <h3 style="font-weight: 900; margin-bottom: 1.5rem; font-size: 1.5rem;">📜 GAME MECHANICS & RULES:</h3>
+            <h3 style="font-weight: 900; margin-bottom: 1.5rem; font-size: 1.5rem;">📜 ATURAN MAINNYA:</h3>
             <ul style="font-weight: 600; line-height: 2; font-size: 1.1rem;">
-                <li>🔥 <strong style="color: #ef4444;">Overtake Reset</strong>: If your new score passes an opponent's total, their score <strong style="text-decoration: underline;">RESETS TO ZERO</strong> (Target must be > 100).</li>
-                <li>🏆 <strong>Victory</strong>: The first player to reach <strong style="background: var(--main); padding: 0.2rem 0.5rem; border-radius: 5px;">1000 points</strong> wins the game.</li>
-                <li>⚡ <strong>Manual Fix</strong>: Input negative numbers (e.g., -50) to correct score errors or apply penalties.</li>
+                <li>🔥 <strong style="color: #ef4444;">Overtake Reset</strong>: Kalo skor lu ngelewatin skor lawan, skor lawan <strong style="text-decoration: underline;">LANGSUNG JADI NOL</strong> (Kalo skor dia udah > 100).</li>
+                <li>🏆 <strong>Menang</strong>: Yang pertama nyampe <strong
+                        style="background: var(--main); padding: 0.2rem 0.5rem; border-radius: 5px;">1000
+                        poin</strong> dialah pemenangnya.</li>
+                <li>⚡ <strong>Koreksi</strong>: Masukin angka minus (contoh: -50) kalo mau ngurangin skor yang salah input.</li>
             </ul>
         </div>
     </div>
@@ -123,4 +134,5 @@
         }
     </script>
 </body>
+
 </html>

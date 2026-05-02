@@ -49,6 +49,7 @@ class Achievement(Base):
     jumlah_bjp_kk = Column(Integer, default=0)
     jumlah_bjp_jiwa = Column(Integer, default=0)
     target = Column(Integer, default=0)
+    catatan = Column(String)
 
 class RemiGame(Base):
     __tablename__ = "remi_games"

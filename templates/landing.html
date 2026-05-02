@@ -121,36 +121,15 @@
 
 <body>
     <div class="container">
-        <div
-            style="background: var(--white); border: var(--border-width) solid var(--black); border-radius: var(--radius); padding: 3rem; margin-bottom: 3rem; box-shadow: var(--shadow); display: flex; align-items: center; gap: 3rem; position: relative; overflow: hidden; animation: fadeIn 0.8s ease-out;">
-            <div style="flex: 1; z-index: 2;">
-                <div style="display: flex; gap: 0.5rem; margin-bottom: 1rem;">
-                    <span class="status-badge status-high" style="border: 2px solid #000;">SYSTEM ONLINE</span>
-                    <span class="status-badge"
-                        style="background: #e0f2fe; color: #0369a1; border: 2px solid #000;">AUTHORIZED ACCESS</span>
-                </div>
-                <h1 style="font-size: 4.5rem; margin-bottom: 0.5rem; line-height: 0.85; color: var(--text);">
-                    AMS<br>CENTRAL HUB</h1>
-                <p class="subtitle"
-                    style="font-size: 1.4rem; color: var(--text); margin-bottom: 2rem; font-weight: 600; opacity: 0.8;">
-                    Portal Bidang Air Minum & Sanitasi <br>Kabupaten Cianjur</p>
-                <div style="display: flex; gap: 1.5rem;">
-                    <button class="btn" style="background: #f87171; font-size: 1.1rem;"
-                        onclick="location.href='/logout'">LOGOUT SYSTEM</button>
-                    <button class="btn" style="background: #ffffff; font-size: 1.1rem;" onclick="toggleTheme()">THEME
-                        MODE</button>
-                </div>
-            </div>
-            <div style="flex: 0 0 400px; position: relative; z-index: 1;">
-                <img src="/static/hero.png" alt="Hero" class="hero-img"
-                    style="width: 140%; height: auto; transform: rotate(-5deg) translateX(20px);">
-            </div>
-        </div>
+        {% set title = "BID<br>AMS" %}
+        {% set subtitle = "Portal Bidang Air Minum & Sanitasi <br>Kabupaten Cianjur" %}
+        {% set badge2 = "AKSES KHUSUS CUY" %}
+        {% include 'header_component.html' %}
 
         <div class="news-ticker" id="newsTickerContainer">
-            <div class="ticker-label">LATEST UPDATES</div>
+            <div class="ticker-label">INFO TERBARU</div>
             <div class="ticker-content" id="tickerContent">
-                Syncing global news feed...
+                Lagi narik berita dulu, sabar...
             </div>
         </div>
 
@@ -203,10 +182,10 @@
                     });
                     ticker.innerHTML = tickerHtml;
                 } else {
-                    ticker.innerHTML = "News feed temporarily unavailable.";
+                    ticker.innerHTML = "Waduh, beritanya lagi macet.";
                 }
             } catch (error) {
-                ticker.innerHTML = "Connectivity issue with news feed.";
+                ticker.innerHTML = "Lagi gak ada koneksi nih.";
                 console.error('Error fetching news:', error);
             }
         }

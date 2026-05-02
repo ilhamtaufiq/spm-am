@@ -10,36 +10,18 @@
 
 <body>
     <div class="container">
-        <div
-            style="background: var(--white); border: var(--border-width) solid var(--black); border-radius: var(--radius); padding: 3rem; margin-bottom: 3rem; box-shadow: var(--shadow); display: flex; align-items: center; gap: 3rem; position: relative; overflow: hidden; animation: fadeIn 0.8s ease-out;">
-            <div style="flex: 1; z-index: 2;">
-                <div style="display: flex; gap: 0.5rem; margin-bottom: 1rem;">
-                    <span class="status-badge status-high" style="border: 2px solid #000;">ANALYSIS ENGINE</span>
-                    <span class="status-badge"
-                        style="background: #e0f2fe; color: #0369a1; border: 2px solid #000;">MULTIFILE ENABLED</span>
-                </div>
-                <h1 style="font-size: 4.5rem; margin-bottom: 0.5rem; line-height: 0.85; color: var(--text);">
-                    RAB<br>ANALYZER</h1>
-                <p class="subtitle"
-                    style="font-size: 1.4rem; color: var(--text); margin-bottom: 2rem; font-weight: 600; opacity: 0.8;">
-                    Ekstraksi Data RAB Excel MCK <br>Secara Otomatis & Cerdas</p>
-                <div style="display: flex; gap: 1.5rem;">
-                    <button class="btn" style="background: #ffffff; font-size: 1.1rem;" onclick="location.href='/'">BACK
-                        TO HUB</button>
-                    <button class="btn" style="background: var(--main); font-size: 1.1rem;"
-                        onclick="toggleTheme()">THEME MODE</button>
-                </div>
-            </div>
-            <div style="flex: 0 0 400px; position: relative; z-index: 1;">
-                <img src="/static/hero.png" alt="Hero" class="hero-img"
-                    style="width: 140%; height: auto; transform: rotate(5deg) scaleX(-1) translateX(20px);">
-            </div>
-        </div>
+        {% set title = "CEK RAB MCK" %}
+        {% set subtitle = "Ekstraksi Data RAB Excel MCK <br>Secara Otomatis & Cerdas" %}
+        {% set badge1 = "MESIN ANALISA GOKIL" %}
+        {% set badge2 = "BISA BANYAK FILE SEKALIGUS" %}
+        {% set show_back = true %}
+        {% set back_url = "/" %}
+        {% set back_text = "BACK TO HUB" %}
+        {% include 'header_component.html' %}
 
         <div class="card stat-card" style="background: var(--accent); margin-bottom: 3rem; animation: none;">
-            <h2 style="margin-bottom: 1.5rem; font-weight: 900; font-size: 2rem;">UPLOAD RAB FILES</h2>
-            <p style="margin-bottom: 2rem; font-weight: 600; font-size: 1.1rem;">Upload multiple Excel RAB (MCK) files
-                to extract itemized work data instantly.</p>
+            <h2 style="margin-bottom: 1.5rem; font-weight: 900; font-size: 2rem;">UPLOAD FILE RAB LU</h2>
+            <p style="margin-bottom: 2rem; font-weight: 600; font-size: 1.1rem;">Masukin file Excel RAB (MCK) biar data itemnya langsung kesedot otomatis.</p>
 
             <div style="display: flex; flex-direction: column; gap: 1.5rem;">
                 <div class="form-group">
@@ -48,7 +30,7 @@
                 </div>
                 <button type="button" id="analyzeBtn" class="btn btn-primary"
                     style="background: var(--main); width: fit-content; padding: 1.2rem 3rem; font-size: 1.1rem;"
-                    onclick="analyzeFiles()">START MULTI-FILE ANALYSIS</button>
+                    onclick="analyzeFiles()">GAS ANALISA SEKARANG!</button>
             </div>
         </div>
 
@@ -56,10 +38,10 @@
             style="display: none; margin-bottom: 3rem; animation: fadeIn 0.5s ease-out;">
             <div
                 style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;">
-                <h2 style="font-weight: 900; font-size: 2rem;">EXTRACTION RESULTS (<span id="itemCount">0</span> ITEMS)
+                <h2 style="font-weight: 900; font-size: 2rem;">HASIL SEDOT DATA (<span id="itemCount">0</span> ITEM)
                 </h2>
                 <button class="btn" style="background: #10b981; color: white; padding: 1rem 2rem;"
-                    onclick="downloadXlsx()">DOWNLOAD EXCEL (.XLSX)</button>
+                    onclick="downloadXlsx()">SEDOT JADI EXCEL (.XLSX)</button>
             </div>
 
             <div class="table-container">
@@ -83,14 +65,14 @@
             </div>
         </div>
 
-        <div class="card" style="background: #f1f5f9;">
-            <h3 style="margin-bottom: 1.5rem; font-weight: 900; font-size: 1.5rem;">USER GUIDE & NOTES</h3>
-            <ul style="padding-left: 1.5rem; font-weight: 600; line-height: 2; font-size: 1rem;">
-                <li>Use standard RAB templates (MCK).</li>
-                <li>Ensure data is located in a sheet named "RAB".</li>
-                <li>System starts processing from Row 77.</li>
-                <li>Hidden rows are automatically skipped to maintain data integrity.</li>
-                <li>The output is a standardized .xlsx file ready for further processing.</li>
+        <div class="card" style="background: var(--card-bg); border: var(--border-width) solid var(--black);">
+            <h3 style="margin-bottom: 1.5rem; font-weight: 900; font-size: 1.5rem; color: var(--text);">CARA PAKAI & CATATAN PENTING</h3>
+            <ul style="padding-left: 1.5rem; font-weight: 600; line-height: 2; font-size: 1rem; color: var(--text);">
+                <li>Pake template RAB standar (MCK).</li>
+                <li>Pastiin datanya ada di sheet namanya "RAB".</li>
+                <li>Sistem otomatis narik data mulai dari Baris 77.</li>
+                <li>Baris yang di-hide otomatis dilewatin biar datanya gak double.</li>
+                <li>Hasilnya file .xlsx standar yang siap lu olah lagi.</li>
             </ul>
         </div>
     </div>
@@ -113,7 +95,7 @@
             const fileInput = document.getElementById('fileInput');
             const btn = document.getElementById('analyzeBtn');
             if (fileInput.files.length === 0) {
-                alert("Please select files first!");
+                alert("Pilih filenya dulu dong!");
                 return;
             }
 
@@ -123,7 +105,7 @@
             }
 
             btn.disabled = true;
-            btn.textContent = "PROCESSING DATA...";
+            btn.textContent = "LAGI NYEDOT DATA...";
 
             try {
                 const response = await fetch('/rab/analyze', {
@@ -136,14 +118,14 @@
                     extractedData = result.data;
                     displayResults(result);
                 } else {
-                    alert("Failure: " + result.message);
+                    alert("Gagal cuy: " + result.message);
                 }
             } catch (error) {
-                alert("Server connectivity error.");
+                alert("Waduh, servernya lagi error.");
                 console.error(error);
             } finally {
                 btn.disabled = false;
-                btn.textContent = "START MULTI-FILE ANALYSIS";
+                btn.textContent = "GAS ANALISA SEKARANG!";
             }
         }
 
@@ -195,7 +177,7 @@
                 a.click();
                 a.remove();
             } catch (error) {
-                alert("Download failed.");
+                alert("Gagal download nih.");
             }
         }
     </script>

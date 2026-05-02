@@ -18,12 +18,12 @@ from models import RemiGame, RemiPlayer
 DATABASE_PATH = "./data/spm_am.db"
 SEED_PATH = "./spm_am.db"
 
-if not os.path.exists("./data"):
-    os.makedirs("./data")
+# if not os.path.exists("./data"):
+#     os.makedirs("./data")
 
-if not os.path.exists(DATABASE_PATH) or os.path.getsize(DATABASE_PATH) == 0:
-    if os.path.exists(SEED_PATH) and os.path.getsize(SEED_PATH) > 0:
-        shutil.copy2(SEED_PATH, DATABASE_PATH)
+# if not os.path.exists(DATABASE_PATH) or os.path.getsize(DATABASE_PATH) == 0:
+#     if os.path.exists(SEED_PATH) and os.path.getsize(SEED_PATH) > 0:
+#         shutil.copy2(SEED_PATH, DATABASE_PATH)
 
 models.Base.metadata.create_all(bind=engine)
 
@@ -121,7 +121,8 @@ async def read_root(request: Request, db: Session = Depends(get_db)):
                 "sumber_mata_air_kap": item.sumber_mata_air_kap,
                 "sumber_air_tanah_kap": item.sumber_air_tanah_kap,
                 "lain_lain_kap": item.lain_lain_kap,
-                "tarif_dasar_hukum": item.tarif_dasar_hukum
+                "tarif_dasar_hukum": item.tarif_dasar_hukum,
+                "catatan": item.catatan
             }
         })
         
@@ -184,6 +185,7 @@ async def add_data(
     biaya_operasional: str = Form(None),
     sumber_dana: str = Form("Manual"),
     program: str = Form("Manual"),
+    catatan: str = Form(None),
     db: Session = Depends(get_db)
 ):
     if not get_current_user(request): return RedirectResponse(url="/login", status_code=302)
@@ -199,7 +201,7 @@ async def add_data(
         sumber_air_tanah_kap=sumber_air_tanah_kap, lain_lain_kap=lain_lain_kap,
         tarif_dasar_hukum=tarif_dasar_hukum, iuran_nominal=iuran_nominal,
         biaya_operasional=biaya_operasional, sumber_dana=sumber_dana,
-        program=program
+        program=program, catatan=catatan
     )
     db.add(new_item)
     db.commit()
@@ -226,6 +228,7 @@ async def update_item(
     biaya_operasional: str = Form(None),
     sumber_dana: str = Form(None),
     program: str = Form(None),
+    catatan: str = Form(None),
     db: Session = Depends(get_db)
 ):
     if not get_current_user(request): return RedirectResponse(url="/login", status_code=302)
@@ -250,6 +253,7 @@ async def update_item(
         item.biaya_operasional = biaya_operasional
         item.sumber_dana = sumber_dana
         item.program = program
+        item.catatan = catatan
         db.commit()
     return RedirectResponse(url="/spm", status_code=303)
 

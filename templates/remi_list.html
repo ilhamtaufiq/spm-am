@@ -47,84 +47,66 @@
 
 <body>
     <div class="container">
-        <div
-            style="background: var(--white); border: var(--border-width) solid var(--black); border-radius: var(--radius); padding: 3rem; margin-bottom: 3rem; box-shadow: var(--shadow); display: flex; align-items: center; gap: 3rem; position: relative; overflow: hidden; animation: fadeIn 0.8s ease-out;">
-            <div style="flex: 1; z-index: 2;">
-                <div style="display: flex; gap: 0.5rem; margin-bottom: 1rem;">
-                    <span class="status-badge status-high" style="border: 2px solid #000;">GAME SERVER ONLINE</span>
-                    <span class="status-badge"
-                        style="background: #fef3c7; color: #92400e; border: 2px solid #000;">COMPETITIVE MODE</span>
-                </div>
-                <h1 style="font-size: 4.5rem; margin-bottom: 0.5rem; line-height: 0.85; color: var(--text);">
-                    REMI<br>COUNTER</h1>
-                <p class="subtitle"
-                    style="font-size: 1.4rem; color: var(--text); margin-bottom: 2rem; font-weight: 600; opacity: 0.8;">
-                    Leaderboard & History <br>Sistem Skor Overtake Reset</p>
-                <div style="display: flex; gap: 1.5rem;">
-                    <button class="btn" style="background: #ffffff; font-size: 1.1rem;" onclick="location.href='/'">BACK
-                        TO HUB</button>
-                    <button class="btn" style="background: var(--main); font-size: 1.1rem;"
-                        onclick="toggleTheme()">THEME MODE</button>
-                </div>
-            </div>
-            <div style="flex: 0 0 400px; position: relative; z-index: 1;">
-                <img src="/static/hero.png" alt="Hero" class="hero-img"
-                    style="width: 140%; height: auto; transform: rotate(-10deg) translateX(20px);">
-            </div>
-        </div>
+        {% set title = "REMI<br>CUP" %}
+        {% set subtitle = "Papan Skor & Sejarah <br>Sistem Skor Overtake Reset" %}
+        {% set badge1 = "SERVER READY BOS" %}
+        {% set badge2 = "MODE SERIUS" %}
+        {% set show_back = true %}
+        {% set back_url = "/" %}
+        {% set back_text = "BALIK KE LOBBY" %}
+        {% include 'header_component.html' %}
 
         {% if top_winners %}
         <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 2rem;">
-            <h2 style="font-weight: 900; text-transform: uppercase; font-size: 2rem;">🏆 Hall of Fame</h2>
+            <h2 style="font-weight: 900; text-transform: uppercase; font-size: 2rem;">🏆 Para Jawara</h2>
             <div style="flex: 1; height: 4px; background: #000;"></div>
         </div>
         <div class="hall-of-fame">
             {% for winner in top_winners %}
-            <div class="card winner-card" style="background: {{ ['#fcd34d', '#e2e8f0', '#fbbf24'][loop.index0] }};">
+            <div class="card winner-card" style="background: {{ ['#fcd34d', '#e2e8f0', '#fbbf24'][loop.index0] }}; color: #000;">
                 <div class="rank-badge">#{{ loop.index }}</div>
                 <div style="font-size: 4rem; margin-bottom: 1rem; filter: drop-shadow(4px 4px 0px rgba(0,0,0,0.1));">👑
                 </div>
-                <h3 style="font-weight: 900; text-transform: uppercase; font-size: 1.8rem; line-height: 1;">{{
+                <h3 style="font-weight: 900; text-transform: uppercase; font-size: 1.8rem; line-height: 1; color: #000;">{{
                     winner.winner_name }}</h3>
                 <div
                     style="font-weight: 900; font-size: 1.1rem; margin-top: 1rem; background: rgba(0,0,0,0.1); padding: 0.5rem; border-radius: 8px;">
-                    {{ winner.total_wins }} WINS</div>
+                    {{ winner.total_wins }} KALI MENANG</div>
             </div>
             {% endfor %}
         </div>
         {% endif %}
 
         <div class="card stat-card" style="background: var(--main); margin-bottom: 3rem; animation: none;">
-            <h2 style="font-weight: 900; margin-bottom: 2rem; font-size: 2rem;">START NEW GAME</h2>
+            <h2 style="font-weight: 900; margin-bottom: 2rem; font-size: 2rem;">MAIN LAGI KUY!</h2>
             <form action="/remi/new" method="post">
                 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 2rem;">
                     {% for i in range(1, 5) %}
                     <div class="form-group">
                         <label
-                            style="font-weight: 900; display: block; margin-bottom: 0.8rem; font-size: 1.1rem;">PLAYER
+                            style="font-weight: 900; display: block; margin-bottom: 0.8rem; font-size: 1.1rem;">PEMAIN
                             {{ i }}</label>
-                        <input type="text" name="p{{ i }}" class="form-input" placeholder="Enter Name" required
+                        <input type="text" name="p{{ i }}" class="form-input" placeholder="Nama Lu" required
                             style="width: 100%; padding: 1.2rem; font-size: 1.1rem;">
                     </div>
                     {% endfor %}
                 </div>
                 <button type="submit" class="btn btn-primary"
-                    style="margin-top: 2.5rem; background: #000; color: #fff; width: 100%; font-size: 1.5rem; padding: 1.5rem;">START
-                    THE GAME! 🃏</button>
+                    style="margin-top: 2.5rem; background: #000; color: #fff; width: 100%; font-size: 1.5rem; padding: 1.5rem;">GAS MAIN! 🃏</button>
             </form>
         </div>
 
         <div class="card">
-            <h2 style="font-weight: 900; margin-bottom: 2rem; font-size: 2rem;">GAME HISTORY</h2>
+            <h2 style="font-weight: 900; margin-bottom: 2rem; font-size: 2rem;">RIWAYAT PERTEMPURAN</h2>
             <div class="table-container">
                 <table>
                     <thead>
                         <tr>
-                            <th>DATE & TIME</th>
+                            <th>TANGGAL & JAM</th>
                             <th>GAME ID</th>
                             <th>STATUS</th>
-                            <th>WINNER</th>
-                            <th>ACTIONS</th>
+                            <th>PEMENANG</th>
+                            <th>AKSI</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -134,19 +116,19 @@
                             <td style="font-weight: 800;">#{{ game.id }}</td>
                             <td>
                                 {% if game.is_active %}
-                                <span class="status-badge status-high" style="background: #60a5fa;">IN PROGRESS</span>
+                                <span class="status-badge status-high" style="background: #60a5fa;">LAGI MAIN</span>
                                 {% else %}
-                                <span class="status-badge" style="background: #94a3b8; color: white;">FINISHED</span>
+                                <span class="status-badge" style="background: #94a3b8; color: white;">SELESAI</span>
                                 {% endif %}
                             </td>
                             <td style="font-weight: 900; color: var(--main-dark);">{{ game.winner_name or '-' }}</td>
                             <td style="display: flex; gap: 1rem;">
                                 <a href="/remi/{{ game.id }}" class="btn btn-primary"
-                                    style="padding: 0.8rem 1.5rem; font-size: 0.9rem;">VIEW BOARD</a>
+                                    style="padding: 0.8rem 1.5rem; font-size: 0.9rem;">LIHAT SKOR</span></a>
                                 <form action="/remi/{{ game.id }}/delete" method="post"
-                                    onsubmit="return confirm('Archive this game permanently?')">
+                                    onsubmit="return confirm('Hapus permanen nih?')">
                                     <button type="submit" class="btn btn-danger"
-                                        style="padding: 0.8rem 1.5rem; font-size: 0.9rem;">DELETE</button>
+                                        style="padding: 0.8rem 1.5rem; font-size: 0.9rem;">HAPUS</button>
                                 </form>
                             </td>
                         </tr>
