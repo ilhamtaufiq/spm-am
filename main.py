@@ -214,6 +214,10 @@ async def add_data(
     )
     db.add(new_item)
     db.commit()
+    
+    if request.headers.get("X-Requested-With") == "XMLHttpRequest":
+        return {"status": "success", "message": "Berhasil simpan data baru"}
+        
     return RedirectResponse(url="/spm", status_code=303)
 
 @app.post("/update/{item_id}")
@@ -264,6 +268,10 @@ async def update_item(
         item.program = program
         item.catatan = catatan
         db.commit()
+        
+    if request.headers.get("X-Requested-With") == "XMLHttpRequest":
+        return {"status": "success", "message": "Berhasil update data"}
+        
     return RedirectResponse(url="/spm", status_code=303)
 
 # RAB ANALYZER ROUTES
@@ -510,6 +518,62 @@ async def update_simspam(request: Request, db: Session = Depends(get_db)):
     ).update({"is_simspam": 1 if is_checked else 0}, synchronize_session=False)
     db.commit()
     return {"status": "success"}
+
+
+
+
+@app.get("/api/data")
+async def get_all_data(request: Request, db: Session = Depends(get_db)):
+    if not get_current_user(request): return {"status": "error", "message": "Unauthorized"}
+    
+    bjp_map = load_bjp_data()
+    items_raw = db.query(Achievement).all()
+    grouped = {}
+    for item in items_raw:
+        key = (item.kecamatan.upper(), item.desa.upper().replace(' ', ''))
+        if key not in grouped:
+            bjp_kk = item.jumlah_bjp_kk if (item.jumlah_bjp_kk and item.jumlah_bjp_kk > 0) else bjp_map.get(key, 0)
+            grouped[key] = {
+                "kecamatan": item.kecamatan, 
+                "desa": item.desa, 
+                "is_simspam": item.is_simspam,
+                "target": item.target, 
+                "total_sr": 0, "total_kk": 0, 
+                "total_bjp_kk": 0, 
+                "years_list": []
+            }
+        
+        bjp_kk_row = item.jumlah_bjp_kk if (item.jumlah_bjp_kk and item.jumlah_bjp_kk > 0) else bjp_map.get(key, 0)
+        grouped[key]["total_sr"] += (item.jumlah_sr or 0)
+        grouped[key]["total_kk"] += (item.jumlah_kk or 0)
+        grouped[key]["total_bjp_kk"] += (item.jumlah_bjp_kk or 0)
+        grouped[key]["years_list"].append({
+            "id": item.id, "tahun": item.tahun, 
+            "sr": item.jumlah_sr or 0, "kk": item.jumlah_kk or 0, "jiwa": item.jumlah_jiwa or 0,
+            "bjp_kk": bjp_kk_row, "bjp_jiwa": (bjp_kk_row * 5),
+            "meta": {
+                "sumber_dana": item.sumber_dana, "program": item.program,
+                "sistem_layanan": item.sistem_layanan, "kepala": item.kepala,
+                "iuran_nominal": item.iuran_nominal, "biaya_operasional": item.biaya_operasional,
+                "pokmas": item.pokmas, "perdes": item.perdes,
+                "bendahara": item.bendahara, "sekretaris": item.sekretaris,
+                "sumber_mata_air_kap": item.sumber_mata_air_kap,
+                "sumber_air_tanah_kap": item.sumber_air_tanah_kap,
+                "lain_lain_kap": item.lain_lain_kap,
+                "tarif_dasar_hukum": item.tarif_dasar_hukum,
+                "catatan": item.catatan
+            }
+        })
+        
+    for key, data in grouped.items():
+        if data["total_bjp_kk"] == 0:
+            data["bjp_kk"] = bjp_map.get(key, 0)
+        else:
+            data["bjp_kk"] = data["total_bjp_kk"]
+        data["bjp_jiwa"] = data["bjp_kk"] * 5
+
+    display_items = sorted(grouped.values(), key=lambda x: (x["kecamatan"], x["desa"]))
+    return {"status": "success", "items": display_items}
 
 
 if __name__ == "__main__":
