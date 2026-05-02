@@ -14,10 +14,15 @@
     - Updated `main.py` to save and fetch round history.
     - Updated `remi_game.html` with win animations (confetti) and history table.
     - Verified database table creation.
-  - Now: Ready for user verification.
-  - Next: Any further UI polish or feature requests.
-- Open questions (UNCONFIRMED):
-  - None at the moment.
+  - Done: 
+    - Analyzed why DB was overwritten (tracked in Git + `.gitignore` commented).
+    - Moved active DB to `data/spm_am.db`.
+    - Updated `main.py` with auto-seed logic.
+    - Fixed `.gitignore` to ignore `.db` files.
+  - Now: Waiting for user to run `git rm --cached spm_am.db` or verify.
+  - Next: Any further UI polish.
+
+
 
 - Working set:
   - `templates/remi_game.html`

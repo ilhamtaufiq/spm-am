@@ -19,12 +19,14 @@ from models import RemiGame, RemiPlayer, RemiRound
 DATABASE_PATH = "./data/spm_am.db"
 SEED_PATH = "./spm_am.db"
 
-# if not os.path.exists("./data"):
-#     os.makedirs("./data")
+if not os.path.exists("./data"):
+    os.makedirs("./data")
 
-# if not os.path.exists(DATABASE_PATH) or os.path.getsize(DATABASE_PATH) == 0:
-#     if os.path.exists(SEED_PATH) and os.path.getsize(SEED_PATH) > 0:
-#         shutil.copy2(SEED_PATH, DATABASE_PATH)
+if not os.path.exists(DATABASE_PATH) or os.path.getsize(DATABASE_PATH) == 0:
+    if os.path.exists(SEED_PATH) and os.path.getsize(SEED_PATH) > 0:
+        import shutil
+        shutil.copy2(SEED_PATH, DATABASE_PATH)
+
 
 models.Base.metadata.create_all(bind=engine)
 
