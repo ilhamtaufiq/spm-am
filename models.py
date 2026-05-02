@@ -64,3 +64,12 @@ class RemiPlayer(Base):
     game_id = Column(Integer)
     name = Column(String)
     total_score = Column(Integer, default=0)
+
+class RemiRound(Base):
+    __tablename__ = "remi_rounds"
+    id = Column(Integer, primary_key=True, index=True)
+    game_id = Column(Integer)
+    player_id = Column(Integer)
+    points = Column(Integer)
+    round_number = Column(Integer)
+

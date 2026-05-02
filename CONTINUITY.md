@@ -1,42 +1,25 @@
-# SPM Super App - Continuity Ledger
+# Continuity Ledger
 
-## Goal
-Redesign the SIMSPAM dashboard UI with a focus on responsiveness, professional aesthetics, and the integration of a new "Catatan" (Notes) feature.
+- Goal: Add win celebration animations and round-by-round score history to the Remi Game.
+- Constraints/Assumptions:
+  - Using existing Jinja2 templates (`remi_game.html`).
+  - Need to handle score history in the backend or session.
+  - UI should look premium/gaul as per previous conversations.
+- Key decisions:
+  - Use a library like `canvas-confetti` or similar for the celebration animation if possible, or vanilla CSS/JS.
+  - Modify `Game` model or the data structure passed to the template to include a list of round scores.
+- State:
+  - Done: 
+    - Added `RemiRound` model to `models.py`.
+    - Updated `main.py` to save and fetch round history.
+    - Updated `remi_game.html` with win animations (confetti) and history table.
+    - Verified database table creation.
+  - Now: Ready for user verification.
+  - Next: Any further UI polish or feature requests.
+- Open questions (UNCONFIRMED):
+  - None at the moment.
 
-### Success Criteria
-- [x] "Catatan" column added to table and modals.
-- [x] Reverted font to `Outfit`.
-- [x] Restored neobrutalist branding (white background, black borders, hard shadows).
-- [x] UI localized into Indonesian slang (Gaul) for ALL pages.
-- [x] Removed static hero images and replaced with a dynamic GIF in the header component.
-- [x] Created and implemented a dynamic `header_component.html` used across all modules.
-- [x] Fixed dark mode visibility issues (specifically in RAB and Remi info cards).
-- [x] Fully responsive filter bar and table (UI friendly).
-- [x] Dark mode color optimization for stat cards.
-
-## Constraints/Assumptions
-- Do not reset or overwrite the database during deployment.
-- Use `Outfit` font for branding consistency.
-- Maintain neobrutalist aesthetic elements (shadows, thick borders).
-
-## Key Decisions
-- Integrated a Dribbble GIF into `header_component.html` with neobrutalist styling (rotation/shadow).
-- Added responsive CSS to hide the header GIF on mobile devices.
-
-## State
-- **Done**: Full UI redesign, localization, componentization, and visual enhancement with animated header.
-- **Now**: Handover.
-- **Next**: Monitor user feedback.
-
-## Open Questions
-- None.
-
-## Working Set
-- `templates/header_component.html`
-- `templates/index.html`
-- `templates/landing.html`
-- `templates/rab.html`
-- `templates/remi_list.html`
-- `templates/remi_game.html`
-- `static/style.css`
-- `main.py`
+- Working set:
+  - `templates/remi_game.html`
+  - `main.py`
+  - `models.py`

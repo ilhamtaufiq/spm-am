@@ -48,7 +48,58 @@
             transform: scale(1.05);
             background: rgba(255, 255, 255, 0.2);
         }
+
+        .history-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0 0.5rem;
+        }
+
+        .history-table th {
+            text-align: center;
+            padding: 1rem;
+            text-transform: uppercase;
+            font-weight: 900;
+            font-size: 0.9rem;
+            opacity: 0.7;
+        }
+
+        .history-table td {
+            background: rgba(0, 0, 0, 0.05);
+            padding: 1rem;
+            text-align: center;
+            font-weight: 900;
+            font-size: 1.2rem;
+            border-top: 3px solid #000;
+            border-bottom: 3px solid #000;
+        }
+
+        .history-table td:first-child {
+            border-left: 3px solid #000;
+            border-radius: 12px 0 0 12px;
+        }
+
+        .history-table td:last-child {
+            border-right: 3px solid #000;
+            border-radius: 0 12px 12px 0;
+        }
+
+        .history-table tr:nth-child(even) td {
+            background: rgba(0, 0, 0, 0.02);
+        }
+
+        .reset-badge {
+            background: #ef4444;
+            color: white;
+            font-size: 0.7rem;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            display: block;
+            margin-top: 0.3rem;
+        }
     </style>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
 </head>
 
 <body>
@@ -63,18 +114,55 @@
         {% include 'header_component.html' %}
 
         {% if not game.is_active %}
-        <div class="card stat-card"
-            style="background: #10b981; border-color: #000; margin-bottom: 3rem; text-align: center; padding: 4rem 2rem;">
-            <div style="font-size: 6rem; margin-bottom: 1rem;">🏆</div>
+        <div class="card stat-card" id="winner-card"
+            style="background: #10b981; border-color: #000; margin-bottom: 3rem; text-align: center; padding: 4rem 2rem; position: relative; overflow: hidden;">
+            <div style="font-size: 6rem; margin-bottom: 1rem; animation: tada 1s infinite;">🏆</div>
             <h1 style="color: white; font-weight: 900; font-size: 4rem; text-transform: uppercase; line-height: 1;">
                 PEMENANGNYA:<br>{{ game.winner_name }}</h1>
             <p style="color: white; font-weight: 900; font-size: 1.5rem; margin-top: 2rem; opacity: 0.9;">
                 SELAMAT YA CHAMPION! GOKIL ENTE! </p>
+            <div style="display: flex; gap: 1rem; justify-content: center; margin-top: 2rem;">
+                <span style="font-size: 3rem;">🎺</span>
+                <span style="font-size: 3rem;">🎉</span>
+                <span style="font-size: 3rem;">🎺</span>
+            </div>
             <button class="btn"
                 style="margin-top: 3rem; background: white; color: #10b981; font-size: 1.5rem; padding: 1.2rem 4rem;"
                 onclick="location.href='/remi'">MAIN LAGI KUY</button>
         </div>
+        <script>
+            window.addEventListener('DOMContentLoaded', (event) => {
+                var duration = 5 * 1000;
+                var animationEnd = Date.now() + duration;
+                var defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
+
+                function randomInRange(min, max) {
+                    return Math.random() * (max - min) + min;
+                }
+
+                var interval = setInterval(function () {
+                    var timeLeft = animationEnd - Date.now();
+
+                    if (timeLeft <= 0) {
+                        return clearInterval(interval);
+                    }
+
+                    var particleCount = 50 * (timeLeft / duration);
+                    // since particles fall down, start a bit higher than random
+                    confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 } }));
+                    confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 } }));
+                }, 250);
+
+                // Extra blast
+                confetti({
+                    particleCount: 150,
+                    spread: 70,
+                    origin: { y: 0.6 }
+                });
+            });
+        </script>
         {% endif %}
+
 
         <div class="player-grid">
             {% for player in players %}
@@ -91,7 +179,8 @@
         {% if game.is_active %}
         <div class="card" style="background: #6366f1; border-color: #000; padding: 3rem;">
             <h2 style="font-weight: 900; color: white; margin-bottom: 0.5rem; font-size: 2.5rem;">INPUT SKOR</h2>
-            <p style="color: white; font-weight: 600; opacity: 0.9; font-size: 1.2rem;">Masukin poin yang didapet (atau minus) tiap pemain di ronde ini.</p>
+            <p style="color: white; font-weight: 600; opacity: 0.9; font-size: 1.2rem;">Masukin poin yang didapet (atau
+                minus) tiap pemain di ronde ini.</p>
 
             <form action="/remi/{{ game.id }}/round" method="post">
                 <div class="round-form-grid">
@@ -106,19 +195,63 @@
                     {% endfor %}
                 </div>
                 <button type="submit" class="btn btn-primary"
-                    style="margin-top: 3rem; width: 100%; font-size: 2rem; background: #000; color: #fff; padding: 2rem; border-radius: 20px;">GAS INPUT SKOR! 🃏</button>
+                    style="margin-top: 3rem; width: 100%; font-size: 2rem; background: #000; color: #fff; padding: 2rem; border-radius: 20px;">GAS
+                    INPUT SKOR! 🃏</button>
             </form>
         </div>
         {% endif %}
 
+        {% if history %}
+        <div class="card" style="background: white; border-color: #000; padding: 2rem; margin-top: 3rem;">
+            <h2 style="font-weight: 900; margin-bottom: 2rem; font-size: 2rem; text-align: center;">📜 HISTORI RONDE
+            </h2>
+            <div style="overflow-x: auto;">
+                <table class="history-table">
+                    <thead>
+                        <tr>
+                            <th>Round</th>
+                            {% for player in players %}
+                            <th>{{ player.name }}</th>
+                            {% endfor %}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for round_num, round_data in history.items()|sort(attribute='0', reverse=True) %}
+                        <tr>
+                            <td style="background: var(--main); color: #000; border-color: #000;">#{{ round_num }}</td>
+                            {% for player in players %}
+                            <td>
+                                {% set p_score = round_data.get(player.id, 0) %}
+                                {% if p_score > 0 %}
+                                <span style="color: #10b981;">+{{ p_score }}</span>
+                                {% elif p_score < 0 %} <span style="color: #ef4444;">{{ p_score }}</span>
+                                    {% if p_score < -50 %} <span class="reset-badge">KACORET!</span>
+                                        {% endif %}
+                                        {% else %}
+                                        <span style="opacity: 0.3;">0</span>
+                                        {% endif %}
+                            </td>
+                            {% endfor %}
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {% endif %}
+
+
         <div class="card" style="background: var(--white); border-style: dashed; margin-top: 3rem;">
             <h3 style="font-weight: 900; margin-bottom: 1.5rem; font-size: 1.5rem;">📜 ATURAN MAINNYA:</h3>
             <ul style="font-weight: 600; line-height: 2; font-size: 1.1rem;">
-                <li>🔥 <strong style="color: #ef4444;">Overtake Reset</strong>: Kalo skor lu ngelewatin skor lawan, skor lawan <strong style="text-decoration: underline;">LANGSUNG JADI NOL</strong> (Kalo skor dia udah > 100).</li>
+                <li>🔥 <strong style="color: #ef4444;">Kacoret</strong>: Kalo skor lu ngelewatin skor lawan, skor
+                    lawan <strong style="text-decoration: underline;">LANGSUNG JADI NOL</strong> (Kalo skor dia udah >
+                    100).</li>
                 <li>🏆 <strong>Menang</strong>: Yang pertama nyampe <strong
                         style="background: var(--main); padding: 0.2rem 0.5rem; border-radius: 5px;">1000
                         poin</strong> dialah pemenangnya.</li>
-                <li>⚡ <strong>Koreksi</strong>: Masukin angka minus (contoh: -50) kalo mau ngurangin skor yang salah input.</li>
+                <li>⚡ <strong>Koreksi</strong>: Masukin angka minus (contoh: -50) kalo mau ngurangin skor yang salah
+                    input.</li>
             </ul>
         </div>
     </div>

@@ -1,3 +1,4 @@
+from sqlalchemy import func
 from typing import List
 from fastapi import FastAPI, Request, Depends, Form, HTTPException, status, File, UploadFile
 from fastapi.responses import HTMLResponse, RedirectResponse, StreamingResponse
@@ -12,7 +13,7 @@ import shutil
 from io import BytesIO
 import extract_rab
 from datetime import datetime
-from models import RemiGame, RemiPlayer
+from models import RemiGame, RemiPlayer, RemiRound
 
 # Database Seeding Logic
 DATABASE_PATH = "./data/spm_am.db"
@@ -338,7 +339,23 @@ async def remi_dashboard(request: Request, game_id: int, db: Session = Depends(g
     if not get_current_user(request): return RedirectResponse(url="/login")
     game = db.query(RemiGame).filter(RemiGame.id == game_id).first()
     players = db.query(RemiPlayer).filter(RemiPlayer.game_id == game_id).all()
-    return templates.TemplateResponse(request=request, name="remi_game.html", context={"game": game, "players": players})
+    
+    # Get round history
+    rounds_raw = db.query(RemiRound).filter(RemiRound.game_id == game_id).order_by(RemiRound.round_number.desc(), RemiRound.id.asc()).all()
+    
+    # Group rounds for display: {round_num: {player_id: points}}
+    history = {}
+    for r in rounds_raw:
+        if r.round_number not in history:
+            history[r.round_number] = {}
+        history[r.round_number][r.player_id] = r.points
+        
+    return templates.TemplateResponse(request=request, name="remi_game.html", context={
+        "game": game, 
+        "players": players,
+        "history": history
+    })
+
 
 @app.post("/remi/{game_id}/update")
 async def remi_update_score(request: Request, game_id: int, player_id: int = Form(...), added_points: int = Form(...), db: Session = Depends(get_db)):
@@ -374,16 +391,23 @@ async def remi_update_round(request: Request, game_id: int, db: Session = Depend
     form_data = await request.form()
     players = db.query(RemiPlayer).filter(RemiPlayer.game_id == game_id).all()
     
+    # 0. Get current round number
+    last_round = db.query(func.max(RemiRound.round_number)).filter(RemiRound.game_id == game_id).scalar() or 0
+    current_round = last_round + 1
+    
     # 1. Simpan skor lama untuk pengecekan overtake
     old_scores = {p.id: p.total_score for p in players}
     
-    # 2. Update semua skor dulu
+    # 2. Update semua skor dulu dan simpan history
     for player in players:
         added_points = int(form_data.get(f"p_{player.id}") or 0)
         player.total_score += added_points
+        
+        # Save round history
+        round_entry = RemiRound(game_id=game_id, player_id=player.id, points=added_points, round_number=current_round)
+        db.add(round_entry)
 
     # 3. Cek Overtake (Siapa menyalip siapa)
-    # Aturan: Jika A_baru >= B_baru DAN A_lama < B_lama, maka B reset ke 0 (jika B_baru > 100)
     for p_a in players:
         for p_b in players:
             if p_a.id == p_b.id: continue
@@ -391,7 +415,15 @@ async def remi_update_round(request: Request, game_id: int, db: Session = Depend
             # Jika Pemain A menyalip Pemain B
             if p_a.total_score >= p_b.total_score and old_scores[p_a.id] < old_scores[p_b.id]:
                 if p_b.total_score > 100:
+                    # Save a special history entry for the reset
+                    # points = -p_b.total_score (to make it 0)
+                    reset_points = -p_b.total_score
                     p_b.total_score = 0
+                    
+                    # We add another history entry for the reset event
+                    # We can use a decimal round number or just the same round number
+                    reset_entry = RemiRound(game_id=game_id, player_id=p_b.id, points=reset_points, round_number=current_round)
+                    db.add(reset_entry)
     
     # 4. Cek Win Condition
     for player in players:
@@ -402,6 +434,7 @@ async def remi_update_round(request: Request, game_id: int, db: Session = Depend
             
     db.commit()
     return RedirectResponse(url=f"/remi/{game_id}", status_code=303)
+
 
 if __name__ == "__main__":
     import uvicorn
