@@ -679,7 +679,7 @@
                 tr.innerHTML = `
                     <td class="checkbox-cell">
                         <input type="checkbox" class="row-checkbox custom-checkbox" 
-                               data-desa="${item.desa}" onchange="updateSelection()">
+                               data-kec="${item.kecamatan}" data-desa="${item.desa}" onchange="updateSelection()">
                     </td>
                     <td><span class="badge" style="background: var(--bg); padding: 4px 8px; border-radius: 6px; font-size: 0.75rem;">${item.kecamatan}</span></td>
                     <td><strong>${item.desa}</strong></td>
@@ -701,7 +701,7 @@
                     <td style="text-align: center;">
                         <input type="checkbox" class="custom-checkbox" 
                                ${item.is_simspam ? 'checked' : ''} 
-                               onchange="toggleSimspam('${item.desa}', this)"
+                               onchange="toggleSimspam('${item.kecamatan}', '${item.desa}', this)"
                                style="width: 18px; height: 18px;">
                     </td>
                     <td class="catatan-cell" title="${catatan}">${catatan || '-'}</td>
@@ -922,11 +922,13 @@
             const checkboxes = document.querySelectorAll('.row-checkbox');
             checkboxes.forEach(cb => {
                 cb.checked = master.checked;
+                const kec = cb.getAttribute('data-kec');
                 const desa = cb.getAttribute('data-desa');
+                const key = `${kec}|${desa}`;
                 if (master.checked) {
-                    selectedDesa.add(desa);
+                    selectedDesa.add(key);
                 } else {
-                    selectedDesa.delete(desa);
+                    selectedDesa.delete(key);
                 }
             });
             updateStatusBar();
@@ -939,12 +941,14 @@
             let noneChecked = true;
 
             checkboxes.forEach(cb => {
+                const kec = cb.getAttribute('data-kec');
                 const desa = cb.getAttribute('data-desa');
+                const key = `${kec}|${desa}`;
                 if (cb.checked) {
-                    selectedDesa.add(desa);
+                    selectedDesa.add(key);
                     noneChecked = false;
                 } else {
-                    selectedDesa.delete(desa);
+                    selectedDesa.delete(key);
                     allChecked = false;
                 }
             });
@@ -985,8 +989,11 @@
             }
 
             const year = document.getElementById('yearFilter').value;
-            const villages = Array.from(selectedDesa);
-
+            const items = Array.from(selectedDesa).map(k => {
+                const parts = k.split('|');
+                return { kecamatan: parts[0], desa: parts[1] };
+            });
+            
             const btn = event.currentTarget;
             const originalText = btn.innerText;
             btn.innerText = "SABAR...";
@@ -997,7 +1004,7 @@
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        villages: villages,
+                        items: items,
                         catatan: note,
                         year: year
                     })
@@ -1018,12 +1025,13 @@
             }
         }
 
-        async function toggleSimspam(desa, cb) {
+        async function toggleSimspam(kec, desa, cb) {
             try {
                 const res = await fetch('/api/update-simspam', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
+                        kecamatan: kec,
                         village: desa,
                         checked: cb.checked
                     })

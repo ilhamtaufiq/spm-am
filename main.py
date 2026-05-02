@@ -455,32 +455,35 @@ async def bulk_update_catatan(
         return {"status": "error", "message": "Unauthorized"}
     
     data = await request.json()
-    village_names = data.get("villages", [])
+    items = data.get("items", []) # List of {kecamatan, desa}
     new_note = data.get("catatan", "")
     target_year = data.get("year", "All")
     
-    if not village_names:
-        return {"status": "error", "message": "No villages selected"}
+    if not items:
+        return {"status": "error", "message": "No data selected"}
         
-    if target_year != "All":
-        from models import Achievement
-        db.query(Achievement).filter(
-            Achievement.desa.in_(village_names),
-            Achievement.tahun == target_year
-        ).update({"catatan": new_note}, synchronize_session=False)
-    else:
-        from models import Achievement
-        # Update latest record for each village
-        for v_name in village_names:
-            latest = db.query(Achievement).filter(Achievement.desa == v_name).order_by(Achievement.tahun.desc()).first()
+    from models import Achievement
+    for it in items:
+        kec = it.get("kecamatan")
+        desa = it.get("desa")
+        
+        if target_year != "All":
+            db.query(Achievement).filter(
+                Achievement.kecamatan == kec,
+                Achievement.desa == desa,
+                Achievement.tahun == target_year
+            ).update({"catatan": new_note}, synchronize_session=False)
+        else:
+            # Update latest record for each village in that kecamatan
+            latest = db.query(Achievement).filter(
+                Achievement.kecamatan == kec,
+                Achievement.desa == desa
+            ).order_by(Achievement.tahun.desc()).first()
             if latest:
                 latest.catatan = new_note
                 
     db.commit()
-    return {"status": "success", "message": f"Berhasil update {len(village_names)} data."}
-
-
-
+    return {"status": "success", "message": f"Berhasil update {len(items)} data."}
 
 
 @app.get("/api/desa/{kec}")
@@ -490,19 +493,21 @@ async def get_villages_by_kec(kec: str, db: Session = Depends(get_db)):
     return sorted([v[0] for v in villages])
 
 
-
-
 @app.post("/api/update-simspam")
 async def update_simspam(request: Request, db: Session = Depends(get_db)):
     if not get_current_user(request): 
         return {"status": "error", "message": "Unauthorized"}
     data = await request.json()
+    kecamatan = data.get("kecamatan")
     village_name = data.get("village")
     is_checked = data.get("checked")
     
     from models import Achievement
-    # Update all records for this village to keep it consistent
-    db.query(Achievement).filter(Achievement.desa == village_name).update({"is_simspam": 1 if is_checked else 0}, synchronize_session=False)
+    # Update all records for this SPECIFIC village in this SPECIFIC kecamatan
+    db.query(Achievement).filter(
+        Achievement.kecamatan == kecamatan,
+        Achievement.desa == village_name
+    ).update({"is_simspam": 1 if is_checked else 0}, synchronize_session=False)
     db.commit()
     return {"status": "success"}
 
