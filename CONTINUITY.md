@@ -1,30 +1,21 @@
 # Continuity Ledger
 
-- Goal: Add win celebration animations and round-by-round score history to the Remi Game.
+- Goal: Add bulk note-saving feature for selected table rows in `index.html`.
 - Constraints/Assumptions:
-  - Using existing Jinja2 templates (`remi_game.html`).
-  - Need to handle score history in the backend or session.
-  - UI should look premium/gaul as per previous conversations.
+  - Updates should apply to the currently filtered year, or the latest year if "All" is selected.
+  - Maintain neobrutalist UI style.
+  - Backend must be secure (checking user session).
 - Key decisions:
-  - Use a library like `canvas-confetti` or similar for the celebration animation if possible, or vanilla CSS/JS.
-  - Modify `Game` model or the data structure passed to the template to include a list of round scores.
+  - Add a text input in the selection status bar for quick note entry.
+  - Create a new POST endpoint `/api/bulk-update-catatan` in `main.py`.
+  - Use village names as the selection key for bulk operations.
 - State:
   - Done: 
-    - Added `RemiRound` model to `models.py`.
-    - Updated `main.py` to save and fetch round history.
-    - Updated `remi_game.html` with win animations (confetti) and history table.
-    - Verified database table creation.
-  - Done: 
-    - Analyzed why DB was overwritten (tracked in Git + `.gitignore` commented).
-    - Moved active DB to `data/spm_am.db`.
-    - Updated `main.py` with auto-seed logic.
-    - Fixed `.gitignore` to ignore `.db` files.
-  - Now: Waiting for user to run `git rm --cached spm_am.db` or verify.
-  - Next: Any further UI polish.
-
-
-
+    - Added checkbox column and selection logic.
+  - Now: Implementing bulk note update (frontend + backend).
+  - Next: Verify if other bulk operations (e.g., bulk status update) are needed.
+- Open questions:
+  - (None currently)
 - Working set:
-  - `templates/remi_game.html`
+  - `templates/index.html`
   - `main.py`
-  - `models.py`

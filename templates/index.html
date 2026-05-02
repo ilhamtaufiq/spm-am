@@ -159,6 +159,64 @@
             border-color: var(--main);
         }
 
+        /* Custom Checkbox */
+        .checkbox-cell {
+            width: 40px;
+            text-align: center;
+        }
+
+        .custom-checkbox {
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--black);
+            border-radius: 4px;
+            appearance: none;
+            cursor: pointer;
+            position: relative;
+            background: var(--white);
+            transition: all 0.1s;
+            display: inline-block;
+            vertical-align: middle;
+        }
+
+        .custom-checkbox:checked {
+            background: var(--main);
+            box-shadow: 2px 2px 0px 0px var(--black);
+            transform: translate(-1px, -1px);
+        }
+
+        .custom-checkbox:checked::after {
+            content: '✓';
+            color: white;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 12px;
+            font-weight: 800;
+        }
+
+        .selection-status {
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: var(--white);
+            border: 3px solid var(--black);
+            padding: 1rem 2rem;
+            border-radius: 12px;
+            box-shadow: 8px 8px 0px 0px var(--black);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .selection-status.active {
+            transform: translateX(-50%) translateY(0);
+        }
+
         @media (max-width: 992px) {
             .hero-section {
                 flex-direction: column;
@@ -269,6 +327,9 @@
                 <table>
                     <thead>
                         <tr>
+                            <th class="checkbox-cell">
+                                <input type="checkbox" id="selectAll" class="custom-checkbox" onchange="toggleSelectAll(this)">
+                            </th>
                             <th>Kecamatan</th>
                             <th>Desa</th>
                             <th>SR (JP)</th>
@@ -293,6 +354,25 @@
                 style="display: flex; justify-content: center; align-items: center; gap: 0.5rem; margin-top: 1.5rem; padding-bottom: 1rem;">
                 <!-- Buttons will be injected by JavaScript -->
             </div>
+        </div>
+    </div>
+
+    <!-- Selection Status Bar -->
+    <div id="selectionStatus" class="selection-status">
+        <div style="display: flex; flex-direction: column; gap: 0.25rem;">
+            <span id="selectionCount" style="font-weight: 800; font-size: 1.1rem;">0 Terpilih</span>
+            <span style="font-size: 0.7rem; color: var(--text-muted);">Update catatan masal:</span>
+        </div>
+        <input type="text" id="bulkCatatanInput" placeholder="Tulis catatan di sini..." 
+               style="border: 2px solid var(--black); border-radius: 8px; padding: 6px 12px; min-width: 200px; font-size: 0.85rem;">
+        <div style="height: 24px; width: 2px; background: var(--black); opacity: 0.2;"></div>
+        <div style="display: flex; gap: 0.75rem;">
+            <button class="btn btn-primary" style="padding: 8px 16px; font-size: 0.85rem;" onclick="saveBulkCatatan()">
+                🚀 SIMPAN MASAL
+            </button>
+            <button class="btn" style="padding: 8px 16px; font-size: 0.85rem; background: #fee2e2; color: #991b1b;" onclick="clearSelection()">
+                BATAL
+            </button>
         </div>
     </div>
     </div>
@@ -582,6 +662,10 @@
                 const tr = document.createElement('tr');
                 tr.className = 'data-row';
                 tr.innerHTML = `
+                    <td class="checkbox-cell">
+                        <input type="checkbox" class="row-checkbox custom-checkbox" 
+                               data-desa="${item.desa}" onchange="updateSelection()">
+                    </td>
                     <td><span class="badge" style="background: var(--bg); padding: 4px 8px; border-radius: 6px; font-size: 0.75rem;">${item.kecamatan}</span></td>
                     <td><strong>${item.desa}</strong></td>
                     <td style="font-weight: 700;">${sr.toLocaleString()}</td>
@@ -808,6 +892,109 @@
             if (event.target == editModal) closeModal('editModal');
             if (event.target == detailModal) closeModal('detailModal');
             if (event.target == addModal) closeModal('addModal');
+        }
+
+        // Selection Logic
+        let selectedDesa = new Set();
+
+        function toggleSelectAll(master) {
+            const checkboxes = document.querySelectorAll('.row-checkbox');
+            checkboxes.forEach(cb => {
+                cb.checked = master.checked;
+                const desa = cb.getAttribute('data-desa');
+                if (master.checked) {
+                    selectedDesa.add(desa);
+                } else {
+                    selectedDesa.delete(desa);
+                }
+            });
+            updateStatusBar();
+        }
+
+        function updateSelection() {
+            const checkboxes = document.querySelectorAll('.row-checkbox');
+            const master = document.getElementById('selectAll');
+            let allChecked = true;
+            let noneChecked = true;
+
+            checkboxes.forEach(cb => {
+                const desa = cb.getAttribute('data-desa');
+                if (cb.checked) {
+                    selectedDesa.add(desa);
+                    noneChecked = false;
+                } else {
+                    selectedDesa.delete(desa);
+                    allChecked = false;
+                }
+            });
+
+            master.checked = allChecked && checkboxes.length > 0;
+            master.indeterminate = !allChecked && !noneChecked;
+            
+            updateStatusBar();
+        }
+
+        function updateStatusBar() {
+            const bar = document.getElementById('selectionStatus');
+            const count = document.getElementById('selectionCount');
+            const size = selectedDesa.size;
+
+            if (size > 0) {
+                count.innerText = `${size} Desa Terpilih`;
+                bar.classList.add('active');
+            } else {
+                bar.classList.remove('active');
+            }
+        }
+
+        function clearSelection() {
+            selectedDesa.clear();
+            document.getElementById('selectAll').checked = false;
+            document.getElementById('selectAll').indeterminate = false;
+            const checkboxes = document.querySelectorAll('.row-checkbox');
+            checkboxes.forEach(cb => cb.checked = false);
+            updateStatusBar();
+        }
+
+        async function saveBulkCatatan() {
+            const note = document.getElementById('bulkCatatanInput').value;
+            if (!note) {
+                alert("Isi catatannya dulu coy!");
+                return;
+            }
+            
+            const year = document.getElementById('yearFilter').value;
+            const villages = Array.from(selectedDesa);
+            
+            const btn = event.currentTarget;
+            const originalText = btn.innerText;
+            btn.innerText = "SABAR...";
+            btn.disabled = true;
+            
+            try {
+                const res = await fetch('/api/bulk-update-catatan', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        villages: villages,
+                        catatan: note,
+                        year: year
+                    })
+                });
+                
+                const result = await res.json();
+                if (result.status === 'success') {
+                    alert(result.message);
+                    location.reload();
+                } else {
+                    alert("Gagal: " + result.message);
+                }
+            } catch (e) {
+                alert("Error: " + e.message);
+            } finally {
+                btn.innerText = originalText;
+                btn.disabled = false;
+            }
         }
     </script>
 </body>

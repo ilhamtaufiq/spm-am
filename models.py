@@ -1,8 +1,9 @@
-from sqlalchemy import create_engine, Column, Integer, String, Float
+from sqlalchemy import create_engine, Column, Integer, String, Float, ForeignKey, UniqueConstraint, DateTime
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
-
+from sqlalchemy.orm import sessionmaker, relationship
+from sqlalchemy.sql import func
 import os
+
 SQLALCHEMY_DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./data/spm_am.db")
 
 engine = create_engine(
@@ -17,9 +18,9 @@ class Achievement(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     no_urut = Column(Integer)
-    kecamatan = Column(String)
-    desa = Column(String)
-    tahun = Column(String)
+    kecamatan = Column(String, index=True)
+    desa = Column(String, index=True)
+    tahun = Column(String, index=True)
     sumber_dana = Column(String)
     program = Column(String)
     pokmas = Column(String)
@@ -51,25 +52,40 @@ class Achievement(Base):
     target = Column(Integer, default=0)
     catatan = Column(String)
 
+    # Audit
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), onupdate=func.now())
+
+    __table_args__ = (UniqueConstraint('kecamatan', 'desa', 'tahun', name='_desa_tahun_uc'),)
+
 class RemiGame(Base):
     __tablename__ = "remi_games"
     id = Column(Integer, primary_key=True, index=True)
-    created_at = Column(String)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
     is_active = Column(Integer, default=1)
     winner_name = Column(String, nullable=True)
+    
+    players = relationship("RemiPlayer", back_populates="game", cascade="all, delete-orphan")
+    rounds = relationship("RemiRound", back_populates="game", cascade="all, delete-orphan")
 
 class RemiPlayer(Base):
     __tablename__ = "remi_players"
     id = Column(Integer, primary_key=True, index=True)
-    game_id = Column(Integer)
+    game_id = Column(Integer, ForeignKey("remi_games.id"))
     name = Column(String)
     total_score = Column(Integer, default=0)
+    
+    game = relationship("RemiGame", back_populates="players")
+    rounds = relationship("RemiRound", back_populates="player", cascade="all, delete-orphan")
 
 class RemiRound(Base):
     __tablename__ = "remi_rounds"
     id = Column(Integer, primary_key=True, index=True)
-    game_id = Column(Integer)
-    player_id = Column(Integer)
+    game_id = Column(Integer, ForeignKey("remi_games.id"))
+    player_id = Column(Integer, ForeignKey("remi_players.id"))
     points = Column(Integer)
     round_number = Column(Integer)
+
+    game = relationship("RemiGame", back_populates="rounds")
+    player = relationship("RemiPlayer", back_populates="rounds")
 

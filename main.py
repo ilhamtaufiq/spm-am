@@ -438,6 +438,43 @@ async def remi_update_round(request: Request, game_id: int, db: Session = Depend
     return RedirectResponse(url=f"/remi/{game_id}", status_code=303)
 
 
+
+
+@app.post("/api/bulk-update-catatan")
+async def bulk_update_catatan(
+    request: Request,
+    db: Session = Depends(get_db)
+):
+    if not get_current_user(request): 
+        return {"status": "error", "message": "Unauthorized"}
+    
+    data = await request.json()
+    village_names = data.get("villages", [])
+    new_note = data.get("catatan", "")
+    target_year = data.get("year", "All")
+    
+    if not village_names:
+        return {"status": "error", "message": "No villages selected"}
+        
+    if target_year != "All":
+        from models import Achievement
+        db.query(Achievement).filter(
+            Achievement.desa.in_(village_names),
+            Achievement.tahun == target_year
+        ).update({"catatan": new_note}, synchronize_session=False)
+    else:
+        from models import Achievement
+        # Update latest record for each village
+        for v_name in village_names:
+            latest = db.query(Achievement).filter(Achievement.desa == v_name).order_by(Achievement.tahun.desc()).first()
+            if latest:
+                latest.catatan = new_note
+                
+    db.commit()
+    return {"status": "success", "message": f"Berhasil update {len(village_names)} data."}
+
+
+
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
