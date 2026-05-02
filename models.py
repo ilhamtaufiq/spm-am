@@ -51,6 +51,7 @@ class Achievement(Base):
     jumlah_bjp_jiwa = Column(Integer, default=0)
     target = Column(Integer, default=0)
     catatan = Column(String)
+    is_simspam = Column(Integer, default=0) # 0 = No, 1 = Yes
 
     # Audit
     created_at = Column(DateTime(timezone=True), server_default=func.now())

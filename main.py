@@ -42,8 +42,8 @@ def load_bjp_data():
             for line in f:
                 parts = [p.strip() for p in line.split('\t') if p.strip()]
                 if len(parts) >= 3:
-                    kec = parts[0].upper()
-                    desa = parts[1].upper()
+                    kec = parts[0].strip().upper()
+                    desa = parts[1].strip().upper().replace(' ', '')
                     try:
                         kk = int(parts[2].replace(',', '').replace('.', ''))
                         bjp_data[(kec, desa)] = kk
@@ -92,13 +92,14 @@ async def read_root(request: Request, db: Session = Depends(get_db)):
     items_raw = db.query(Achievement).all()
     grouped = {}
     for item in items_raw:
-        key = (item.kecamatan.upper(), item.desa.upper())
+        key = (item.kecamatan.upper(), item.desa.upper().replace(' ', ''))
         if key not in grouped:
             # Use DB value if exists and not zero, otherwise fallback to .md file
             bjp_kk = item.jumlah_bjp_kk if (item.jumlah_bjp_kk and item.jumlah_bjp_kk > 0) else bjp_map.get(key, 0)
             grouped[key] = {
                 "kecamatan": item.kecamatan, 
                 "desa": item.desa, 
+                "is_simspam": item.is_simspam,
                 "target": item.target, 
                 "total_sr": 0, "total_kk": 0, 
                 "total_bjp_kk": 0, # We'll sum this up
@@ -192,6 +193,11 @@ async def add_data(
     db: Session = Depends(get_db)
 ):
     if not get_current_user(request): return RedirectResponse(url="/login", status_code=302)
+    
+    # Normalize
+    kecamatan = kecamatan.upper()
+    desa = desa.upper().replace(" ", "")
+    
     existing = db.query(Achievement).filter(Achievement.desa == desa).first()
     target = existing.target if existing else 0
     new_item = Achievement(
@@ -473,6 +479,32 @@ async def bulk_update_catatan(
     db.commit()
     return {"status": "success", "message": f"Berhasil update {len(village_names)} data."}
 
+
+
+
+
+@app.get("/api/desa/{kec}")
+async def get_villages_by_kec(kec: str, db: Session = Depends(get_db)):
+    from models import Achievement
+    villages = db.query(Achievement.desa).filter(Achievement.kecamatan == kec).distinct().all()
+    return sorted([v[0] for v in villages])
+
+
+
+
+@app.post("/api/update-simspam")
+async def update_simspam(request: Request, db: Session = Depends(get_db)):
+    if not get_current_user(request): 
+        return {"status": "error", "message": "Unauthorized"}
+    data = await request.json()
+    village_name = data.get("village")
+    is_checked = data.get("checked")
+    
+    from models import Achievement
+    # Update all records for this village to keep it consistent
+    db.query(Achievement).filter(Achievement.desa == village_name).update({"is_simspam": 1 if is_checked else 0}, synchronize_session=False)
+    db.commit()
+    return {"status": "success"}
 
 
 if __name__ == "__main__":

@@ -328,7 +328,8 @@
                     <thead>
                         <tr>
                             <th class="checkbox-cell">
-                                <input type="checkbox" id="selectAll" class="custom-checkbox" onchange="toggleSelectAll(this)">
+                                <input type="checkbox" id="selectAll" class="custom-checkbox"
+                                    onchange="toggleSelectAll(this)">
                             </th>
                             <th>Kecamatan</th>
                             <th>Desa</th>
@@ -337,8 +338,9 @@
                             <th>Jiwa</th>
                             <th style="background: rgba(var(--primary-rgb), 0.05);">BJP (KK)</th>
                             <th style="background: rgba(var(--primary-rgb), 0.05);">BJP (%)</th>
+                            <th>JP (%)</th>
                             <th>Target</th>
-                            <th>Capaian (%)</th>
+                            <th style="text-align: center;">SIMSPAM</th>
                             <th>Catatan</th>
                             <th style="text-align: center;">Aksi</th>
                         </tr>
@@ -363,14 +365,15 @@
             <span id="selectionCount" style="font-weight: 800; font-size: 1.1rem;">0 Terpilih</span>
             <span style="font-size: 0.7rem; color: var(--text-muted);">Update catatan masal:</span>
         </div>
-        <input type="text" id="bulkCatatanInput" placeholder="Tulis catatan di sini..." 
-               style="border: 2px solid var(--black); border-radius: 8px; padding: 6px 12px; min-width: 200px; font-size: 0.85rem;">
+        <input type="text" id="bulkCatatanInput" placeholder="Tulis catatan di sini..."
+            style="border: 2px solid var(--black); border-radius: 8px; padding: 6px 12px; min-width: 200px; font-size: 0.85rem;">
         <div style="height: 24px; width: 2px; background: var(--black); opacity: 0.2;"></div>
         <div style="display: flex; gap: 0.75rem;">
             <button class="btn btn-primary" style="padding: 8px 16px; font-size: 0.85rem;" onclick="saveBulkCatatan()">
                 🚀 SIMPAN MASAL
             </button>
-            <button class="btn" style="padding: 8px 16px; font-size: 0.85rem; background: #fee2e2; color: #991b1b;" onclick="clearSelection()">
+            <button class="btn" style="padding: 8px 16px; font-size: 0.85rem; background: #fee2e2; color: #991b1b;"
+                onclick="clearSelection()">
                 BATAL
             </button>
         </div>
@@ -413,34 +416,44 @@
                 <span class="close" onclick="closeModal('addModal')">&times;</span>
             </div>
             <form action="/add" method="POST">
-                <div class="form-group">
-                    <label>Kecamatan</label>
-                    <select name="kecamatan" required onchange="loadVillages(this.value)">
-                        <option value="">Pilih Kecamatan Dulu...</option>
-                        {% for kec in kecamatan_list %}
-                        <option value="{{ kec }}">{{ kec }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label>Desa</label>
-                    <select name="desa" id="addDesaDropdown" required>
-                        <option value="">Pilih Desanya...</option>
-                    </select>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                    <div class="form-group">
+                        <label
+                            style="font-weight: 800; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 1px;">Kecamatan</label>
+                        <select name="kecamatan" required onchange="loadVillages(this.value)" class="form-select"
+                            style="width: 100%;">
+                            <option value="">Pilih Kecamatan...</option>
+                            {% for kec in kecamatan_list %}
+                            <option value="{{ kec }}">{{ kec }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label
+                            style="font-weight: 800; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 1px;">Desa</label>
+                        <select name="desa" id="addDesaDropdown" required class="form-select" style="width: 100%;">
+                            <option value="">Pilih Desa...</option>
+                        </select>
+                    </div>
                 </div>
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
                     <div class="form-group">
-                        <label>Tahun</label>
-                        <input type="text" name="tahun" placeholder="Contoh: 2026" required>
+                        <label
+                            style="font-weight: 800; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 1px;">Tahun</label>
+                        <input type="text" name="tahun" placeholder="Contoh: 2026" required class="form-input">
                     </div>
                     <div class="form-group">
-                        <label>Jumlah SR</label>
-                        <input type="number" name="jumlah_sr" value="0" required>
+                        <label
+                            style="font-weight: 800; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 1px;">Jumlah
+                            SR</label>
+                        <input type="number" name="jumlah_sr" value="0" required class="form-input">
                     </div>
                 </div>
                 <div class="form-group">
-                    <label>Jumlah KK (JP)</label>
-                    <input type="number" name="jumlah_kk" value="0" required min="0">
+                    <label
+                        style="font-weight: 800; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 1px;">Jumlah
+                        KK (JP)</label>
+                    <input type="number" name="jumlah_kk" value="0" required min="0" class="form-input">
                 </div>
                 <div class="form-group"
                     style="background: rgba(var(--primary-rgb), 0.05); padding: 1rem; border-radius: 12px; border: 1px solid var(--border);">
@@ -453,9 +466,11 @@
                     <textarea name="catatan" class="form-input" style="width: 100%; min-height: 80px; resize: vertical;"
                         placeholder="Tulis catatan di sini kalo ada..."></textarea>
                 </div>
-                <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
-                    <button type="submit" class="btn btn-primary" style="flex: 1;">Gaskeun Simpan!</button>
-                    <button type="button" class="btn" onclick="closeModal('addModal')" style="flex: 1;">Gak Jadi</button>
+                <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+                    <button type="submit" class="btn btn-primary" style="flex: 2; padding: 12px;">🚀 GASKEUN
+                        SIMPAN!</button>
+                    <button type="button" class="btn" onclick="closeModal('addModal')"
+                        style="flex: 1; background: #eee;">GAK JADI</button>
                 </div>
             </form>
         </div>
@@ -677,11 +692,17 @@
                             ${bjp_pct.toFixed(1)}%
                         </span>
                     </td>
-                    <td style="font-weight: 600; color: var(--text-muted);">${item.target.toLocaleString()}</td>
                     <td>
                         <span class="status-badge ${statusCls}">
                             ${rowPct.toFixed(1)}%
                         </span>
+                    </td>
+                    <td style="font-weight: 600; color: var(--text-muted);">${item.target.toLocaleString()}</td>
+                    <td style="text-align: center;">
+                        <input type="checkbox" class="custom-checkbox" 
+                               ${item.is_simspam ? 'checked' : ''} 
+                               onchange="toggleSimspam('${item.desa}', this)"
+                               style="width: 18px; height: 18px;">
                     </td>
                     <td class="catatan-cell" title="${catatan}">${catatan || '-'}</td>
                     <td style="text-align: center;">
@@ -930,7 +951,7 @@
 
             master.checked = allChecked && checkboxes.length > 0;
             master.indeterminate = !allChecked && !noneChecked;
-            
+
             updateStatusBar();
         }
 
@@ -962,15 +983,15 @@
                 alert("Isi catatannya dulu coy!");
                 return;
             }
-            
+
             const year = document.getElementById('yearFilter').value;
             const villages = Array.from(selectedDesa);
-            
+
             const btn = event.currentTarget;
             const originalText = btn.innerText;
             btn.innerText = "SABAR...";
             btn.disabled = true;
-            
+
             try {
                 const res = await fetch('/api/bulk-update-catatan', {
                     method: 'POST',
@@ -981,7 +1002,7 @@
                         year: year
                     })
                 });
-                
+
                 const result = await res.json();
                 if (result.status === 'success') {
                     alert(result.message);
@@ -994,6 +1015,27 @@
             } finally {
                 btn.innerText = originalText;
                 btn.disabled = false;
+            }
+        }
+
+        async function toggleSimspam(desa, cb) {
+            try {
+                const res = await fetch('/api/update-simspam', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        village: desa,
+                        checked: cb.checked
+                    })
+                });
+                const result = await res.json();
+                if (result.status !== 'success') {
+                    alert("Gagal update status SIMSPAM!");
+                    cb.checked = !cb.checked; // Revert
+                }
+            } catch (e) {
+                alert("Error: " + e.message);
+                cb.checked = !cb.checked; // Revert
             }
         }
     </script>

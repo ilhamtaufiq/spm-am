@@ -1,21 +1,38 @@
-# Continuity Ledger
+# Continuity Ledger - SIMSPAM Super App
 
-- Goal: Add bulk note-saving feature for selected table rows in `index.html`.
-- Constraints/Assumptions:
-  - Updates should apply to the currently filtered year, or the latest year if "All" is selected.
-  - Maintain neobrutalist UI style.
-  - Backend must be secure (checking user session).
-- Key decisions:
-  - Add a text input in the selection status bar for quick note entry.
-  - Create a new POST endpoint `/api/bulk-update-catatan` in `main.py`.
-  - Use village names as the selection key for bulk operations.
-- State:
-  - Done: 
-    - Added checkbox column and selection logic.
-  - Now: Implementing bulk note update (frontend + backend).
-  - Next: Verify if other bulk operations (e.g., bulk status update) are needed.
-- Open questions:
-  - (None currently)
-- Working set:
-  - `templates/index.html`
-  - `main.py`
+## Goal (incl. success criteria):
+- Enhance SPM Dashboard with better data integrity, performance, and features.
+- Success: Data deduplicated, schema hardened (FKs, Indexes, Constraints), and SIMSPAM registration tracking implemented.
+- Success: Village names standardized (UPPERCASE, NO SPACES).
+
+## Constraints/Assumptions:
+- Database: SQLite (`data/spm_am.db`).
+- Tech: FastAPI + SQLAlchemy + Vanilla JS.
+- Persona: Casual "gaul" Indonesian.
+
+## Key decisions:
+- Use `is_simspam` column (Integer 0/1) for simspam.id registration status.
+- Standardize village names to `BABAKANKARET` format for consistent matching.
+- Use a dedicated migration script (`deploy_migration.py`) for schema updates.
+
+## State:
+- **Done**:
+    - Bulk update notes feature.
+    - Database hardening (indexes, unique constraints, audit fields).
+    - Restore/Recover data after migration glitch.
+    - Fixed "Add Data" village dropdown API.
+    - Added SIMSPAM column and toggle logic.
+    - Standardized existing data to UPPERCASE_NOSPACES.
+- **Now**:
+    - Validating UI layout and column order.
+- **Next**:
+    - Final user verification of the entire flow.
+
+## Open questions:
+- None for now.
+
+## Working set:
+- `main.py`
+- `models.py`
+- `templates/index.html`
+- `deploy_migration.py` (New deployment tool)
