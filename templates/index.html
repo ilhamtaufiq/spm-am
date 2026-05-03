@@ -242,8 +242,8 @@
 
 <body>
     <div class="container">
-        {% set title = "SPM<br>AM" %}
-        {% set subtitle = "Monitoring Capaian Akses Air Minum & Sanitasi<br>Kabupaten Cianjur" %}
+        {% set title = "Kelembagaan SPAM Perdesaan" %}
+        {% set subtitle = "Monitoring Capaian Akses Air Minum<br>Kabupaten Cianjur" %}
         {% set badge1 = "DATA REALTIME CUY" %}
         {% set badge2 = "VERSI GOKIL" %}
         {% set show_add = true %}
@@ -1028,7 +1028,7 @@
                 const parts = k.split('|');
                 return { kecamatan: parts[0], desa: parts[1] };
             });
-            
+
             const btn = event.currentTarget;
             const originalText = btn.innerText;
             btn.innerText = "SABAR...";
@@ -1086,7 +1086,7 @@
             event.preventDefault();
             const formData = new FormData(form);
             const action = form.action || (modalId === 'addModal' ? '/add' : form.getAttribute('data-action'));
-            
+
             const btn = form.querySelector('button[type="submit"]');
             const originalText = btn.innerText;
             btn.innerText = "MENYIMPAN...";
@@ -1135,7 +1135,7 @@
 
         // We need to update openEdit to set the action on the form properly
         const originalOpenEdit = openEdit;
-        openEdit = function(id, title) {
+        openEdit = function (id, title) {
             originalOpenEdit(id, title);
             const form = document.getElementById('updateForm');
             form.setAttribute('data-action', '/update/' + id);
