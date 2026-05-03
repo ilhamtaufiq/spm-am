@@ -2,9 +2,11 @@
     style="background: var(--white); border: var(--border-width) solid var(--black); border-radius: var(--radius); padding: 3rem; margin-bottom: 3rem; box-shadow: var(--shadow); display: flex; align-items: center; gap: 3rem; position: relative; overflow: hidden; animation: fadeIn 0.8s ease-out;">
     <div style="flex: 1; z-index: 2;">
         <div style="display: flex; gap: 0.5rem; margin-bottom: 1rem;">
-            <span class="status-badge status-high" style="border: 2px solid #000;">{{ badge1 | default('SERVER READY BOS') }}</span>
+            <span class="status-badge status-high" style="border: 2px solid #000;">{{ badge1 | default('SERVER READY
+                BOS') }}</span>
             {% if badge2 %}
-            <span class="status-badge" style="background: #e0f2fe; color: #0369a1; border: 2px solid #000;">{{ badge2 }}</span>
+            <span class="status-badge" style="background: #e0f2fe; color: #0369a1; border: 2px solid #000;">{{ badge2
+                }}</span>
             {% endif %}
         </div>
         <h1 style="font-size: 4.5rem; margin-bottom: 0.5rem; line-height: 0.85; color: var(--text);">
@@ -15,24 +17,30 @@
         <div style="display: flex; gap: 1.5rem; flex-wrap: wrap;">
             {% if show_add %}
             <button class="btn btn-primary" onclick="openAddModal()"
-                style="background: var(--main); color: white; border: var(--border-width) solid var(--black); padding: 0.8rem 2rem;">+ TAMBAH DATA</button>
+                style="background: var(--main); color: white; border: var(--border-width) solid var(--black); padding: 0.8rem 2rem;">+
+                TAMBAH DATA</button>
             {% endif %}
 
             {% if show_back %}
-            <button class="btn" style="background: #ffffff; font-size: 1.1rem; border: var(--border-width) solid var(--black);" 
-                onclick="location.href='{{ back_url | default('/') }}'">{{ back_text | default('BALIK KE LOBBY') }}</button>
+            <button class="btn"
+                style="background: #ffffff; font-size: 1.1rem; border: var(--border-width) solid var(--black);"
+                onclick="location.href='{{ back_url | default('/') }}'">{{ back_text | default('BALIK KE LOBBY')
+                }}</button>
             {% else %}
-            <button class="btn" style="background: #f87171; font-size: 1.1rem; border: var(--border-width) solid var(--black); color: white;"
+            <button class="btn"
+                style="background: #f87171; font-size: 1.1rem; border: var(--border-width) solid var(--black); color: white;"
                 onclick="location.href='/logout'">KELUAR DULU AH</button>
             {% endif %}
-            <button class="btn" style="background: #ffffff; font-size: 1.1rem; border: var(--border-width) solid var(--black);" onclick="toggleTheme()">GANTI TEMA</button>
+            <button class="btn"
+                style="background: #ffffff; font-size: 1.1rem; border: var(--border-width) solid var(--black);"
+                onclick="toggleTheme()">MATI LAMPU</button>
         </div>
     </div>
     <div class="header-visual" style="flex: 0 0 300px; display: flex; justify-content: flex-end; z-index: 2;">
-        <img src="https://cdn.dribbble.com/userupload/24426832/file/original-12ddfb039351c7abff8b95e162a21592.gif" 
-             alt="Header Visual" 
-             style="width: 100%; height: auto; border: var(--border-width) solid var(--black); border-radius: 20px; box-shadow: 10px 10px 0px 0px var(--black); transform: rotate(3deg); transition: transform 0.3s ease;"
-             onmouseover="this.style.transform='rotate(0deg) scale(1.05)'"
-             onmouseout="this.style.transform='rotate(3deg) scale(1)'">
+        <img src="https://cdn.dribbble.com/userupload/24426832/file/original-12ddfb039351c7abff8b95e162a21592.gif"
+            alt="Header Visual"
+            style="width: 100%; height: auto; border: var(--border-width) solid var(--black); border-radius: 20px; box-shadow: 10px 10px 0px 0px var(--black); transform: rotate(3deg); transition: transform 0.3s ease;"
+            onmouseover="this.style.transform='rotate(0deg) scale(1.05)'"
+            onmouseout="this.style.transform='rotate(3deg) scale(1)'">
     </div>
 </div>

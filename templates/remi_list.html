@@ -48,7 +48,7 @@
 <body>
     <div class="container">
         {% set title = "REMI<br>CUP" %}
-        {% set subtitle = "Papan Skor & Sejarah <br>Sistem Skor Overtake Reset" %}
+        {% set subtitle = "Pas Lagi Gabut Doang <br>Gak Ada Kerjaan Sumpah" %}
         {% set badge1 = "SERVER READY BOS" %}
         {% set badge2 = "MODE SERIUS" %}
         {% set show_back = true %}
@@ -63,11 +63,14 @@
         </div>
         <div class="hall-of-fame">
             {% for winner in top_winners %}
-            <div class="card winner-card" style="background: {{ ['#fcd34d', '#e2e8f0', '#fbbf24'][loop.index0] }}; color: #000;">
+            {% set winner_bg = ['#fcd34d', '#e2e8f0', '#fbbf24'][loop.index0] %}
+            <div class="card winner-card" {{ 'style="background: ' ~ winner_bg ~ '; color: #000;"' | safe }}>
                 <div class="rank-badge">#{{ loop.index }}</div>
                 <div style="font-size: 4rem; margin-bottom: 1rem; filter: drop-shadow(4px 4px 0px rgba(0,0,0,0.1));">👑
                 </div>
-                <h3 style="font-weight: 900; text-transform: uppercase; font-size: 1.8rem; line-height: 1; color: #000;">{{
+                <h3
+                    style="font-weight: 900; text-transform: uppercase; font-size: 1.8rem; line-height: 1; color: #000;">
+                    {{
                     winner.winner_name }}</h3>
                 <div
                     style="font-weight: 900; font-size: 1.1rem; margin-top: 1rem; background: rgba(0,0,0,0.1); padding: 0.5rem; border-radius: 8px;">
@@ -92,7 +95,8 @@
                     {% endfor %}
                 </div>
                 <button type="submit" class="btn btn-primary"
-                    style="margin-top: 2.5rem; background: #000; color: #fff; width: 100%; font-size: 1.5rem; padding: 1.5rem;">GAS MAIN! 🃏</button>
+                    style="margin-top: 2.5rem; background: #000; color: #fff; width: 100%; font-size: 1.5rem; padding: 1.5rem;">GAS
+                    MAIN! 🃏</button>
             </form>
         </div>
 
@@ -136,19 +140,20 @@
                     </tbody>
                 </table>
             </div>
+            {% set footer_title = "REMI CUP HALL OF FAME" %}
+            {% include 'footer_component.html' %}
         </div>
-    </div>
-    <script>
-        function toggleTheme() {
-            const body = document.body;
-            const theme = body.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
-            body.setAttribute('data-theme', theme);
-            localStorage.setItem('theme', theme);
-        }
-        if (localStorage.getItem('theme') === 'dark') {
-            document.body.setAttribute('data-theme', 'dark');
-        }
-    </script>
+        <script>
+            function toggleTheme() {
+                const body = document.body;
+                const theme = body.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+                body.setAttribute('data-theme', theme);
+                localStorage.setItem('theme', theme);
+            }
+            if (localStorage.getItem('theme') === 'dark') {
+                document.body.setAttribute('data-theme', 'dark');
+            }
+        </script>
 </body>
 
 </html>

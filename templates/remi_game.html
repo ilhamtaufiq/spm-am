@@ -166,8 +166,10 @@
 
         <div class="player-grid">
             {% for player in players %}
+            {% set player_bg = ['#d8b4fe', '#fcd34d', '#60a5fa', '#fda4af'][loop.index0] %}
+            {% set delay = loop.index0 * 0.2 %}
             <div class="card player-card stat-card"
-                style="background: {{ ['#d8b4fe', '#fcd34d', '#60a5fa', '#fda4af'][loop.index0] }}; animation-delay: {{ loop.index0 * 0.2 }}s;">
+                {{ 'style="background: ' ~ player_bg ~ '; animation-delay: ' ~ delay ~ 's;"' | safe }}>
                 <h3 style="font-weight: 900; text-transform: uppercase; font-size: 1.5rem; opacity: 0.8;">{{ player.name
                     }}</h3>
                 <div class="score">{{ player.total_score }}</div>
@@ -253,7 +255,8 @@
                 <li>⚡ <strong>Koreksi</strong>: Masukin angka minus (contoh: -50) kalo mau ngurangin skor yang salah
                     input.</li>
             </ul>
-        </div>
+        {% set footer_title = "AMS REMI CUP ARENA" %}
+        {% include 'footer_component.html' %}
     </div>
     <script>
         function toggleTheme() {

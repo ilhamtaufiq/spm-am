@@ -6,6 +6,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AMS DASHBOARD - AIR MINUM DAN SANITASI</title>
     <link rel="stylesheet" href="/static/style.css?v=1.3">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
     <style>
         .column-toggles {
             background: var(--card-bg);
@@ -200,7 +204,7 @@
             position: fixed;
             bottom: 2rem;
             left: 50%;
-            transform: translateX(-50%) translateY(100px);
+            transform: translateX(-50%) translateY(300px);
             background: var(--white);
             border: 3px solid var(--black);
             padding: 1rem 2rem;
@@ -243,7 +247,7 @@
 <body>
     <div class="container">
         {% set title = "Kelembagaan SPAM Perdesaan" %}
-        {% set subtitle = "Monitoring Capaian Akses Air Minum<br>Kabupaten Cianjur" %}
+        {% set subtitle = "Ngintipin Sambungan Rumah<br>Kabupaten Cianjur" %}
         {% set badge1 = "DATA REALTIME CUY" %}
         {% set badge2 = "VERSI GOKIL" %}
         {% set show_add = true %}
@@ -253,10 +257,9 @@
         {% include 'header_component.html' %}
 
 
-        <div class="header" style="display: flex; justify-content: space-between; align-items: center;">
-
+        <div id="map" class="card"
+            style="height: 500px; margin-bottom: 2rem; z-index: 10; padding: 0; overflow: hidden; border: 3px solid #000; box-shadow: 10px 10px 0px #000;">
         </div>
-
         <div class="stats-grid">
             <div class="stat-card">
                 <div style="display: flex; justify-content: space-between; align-items: flex-start;">
@@ -275,7 +278,9 @@
                         👨‍👩‍👧</div>
                 </div>
                 <span class="value" id="stat-total-kk">{{ "{:,}".format(total_kk) }}</span>
-                <span class="label" style="font-size: 0.7rem; opacity: 0.8;">Kontribusi: {{ "%.2f"|format(total_kk / total_target * 100) if total_target > 0 else 0 }}%</span>
+                <span class="label" style="font-size: 0.7rem; opacity: 0.8;">Kontribusi: <span id="stat-kk-pct">{{
+                        "%.2f"|format(total_kk /
+                        total_target * 100) if total_target > 0 else 0 }}</span>%</span>
             </div>
             <div class="stat-card" style="background: #fcd34d;">
                 <div style="display: flex; justify-content: space-between; align-items: flex-start;">
@@ -294,7 +299,9 @@
                         💧</div>
                 </div>
                 <span class="value" id="stat-total-bjp">{{ "{:,}".format(total_bjp_kk) }}</span>
-                <span class="label" style="font-size: 0.7rem; opacity: 0.8;">Kontribusi: {{ "%.2f"|format(total_bjp_kk / total_target * 100) if total_target > 0 else 0 }}%</span>
+                <span class="label" style="font-size: 0.7rem; opacity: 0.8;">Kontribusi: <span id="stat-bjp-pct">{{
+                        "%.2f"|format(total_bjp_kk /
+                        total_target * 100) if total_target > 0 else 0 }}</span>%</span>
             </div>
             <div class="stat-card" style="background: #d8b4fe;">
                 <div style="display: flex; justify-content: space-between; align-items: flex-start;">
@@ -306,6 +313,8 @@
                 <span class="value" id="stat-goal">{{ "%.2f"|format(total_combined_percentage) }}%</span>
             </div>
         </div>
+
+
 
         <div class="card">
             <div class="filter-bar" style="margin-bottom: 1.5rem;">
@@ -359,6 +368,9 @@
                 <!-- Buttons will be injected by JavaScript -->
             </div>
         </div>
+
+        {% include 'footer_component.html' %}
+
     </div>
 
     <!-- Selection Status Bar -->
@@ -605,7 +617,7 @@
             </form>
         </div>
     </div>
-    
+
     <!-- JSON Data for JavaScript -->
     <script id="items-data" type="application/json">
         {{ items| tojson | safe }}
@@ -805,6 +817,11 @@
             currentPage = 1;
             renderTable();
             updateStats();
+
+            // Zoom map if initialized
+            if (typeof zoomMapToFilters === 'function') {
+                zoomMapToFilters(kec, search);
+            }
         }
 
         function updateStats() {
@@ -832,16 +849,20 @@
 
             const totalJiwa = totalKk * 5;
             const goal = totalTarget > 0 ? ((totalKk + totalBjp) / totalTarget * 100) : 0;
+            const kkPct = totalTarget > 0 ? (totalKk / totalTarget * 100) : 0;
+            const bjpPct = totalTarget > 0 ? (totalBjp / totalTarget * 100) : 0;
 
             document.getElementById('stat-total-sr').innerText = totalSr.toLocaleString();
             document.getElementById('stat-total-kk').innerText = totalKk.toLocaleString();
             document.getElementById('stat-total-jiwa').innerText = totalJiwa.toLocaleString();
             document.getElementById('stat-total-bjp').innerText = totalBjp.toLocaleString();
             document.getElementById('stat-goal').innerText = goal.toFixed(2) + '%';
+            document.getElementById('stat-kk-pct').innerText = kkPct.toFixed(2);
+            document.getElementById('stat-bjp-pct').innerText = bjpPct.toFixed(2);
         }
 
-        // Initial render
-        applyFilters();
+        // Initial render will be called after map is ready
+        // applyFilters();
 
         function openDetail(item) {
             document.getElementById('detailTitle').innerText = 'Breakdown: Desa ' + item.desa;
@@ -1147,6 +1168,197 @@
             const form = document.getElementById('updateForm');
             form.setAttribute('data-action', '/update/' + id);
         };
+
+        // Map Logic
+        let zoomMapToFilters; // Global reference for filter integration
+
+        const initMap = async () => {
+            const mapContainer = document.getElementById('map');
+            if (!mapContainer) return;
+
+            const map = L.map('map').setView([-6.82, 107.14], 11);
+
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            }).addTo(map);
+
+            try {
+                const response = await fetch('/static/maps/cianjur_desa.geojson');
+                if (!response.ok) throw new Error("Map data not found");
+                const geoData = await response.json();
+
+                // Map items for quick lookup: KEY = KECAMATAN_DESA
+                const villageStats = {};
+                allItems.forEach(item => {
+                    const key = `${item.kecamatan.toUpperCase()}_${item.desa.toUpperCase().replace(/\s/g, '')}`;
+                    villageStats[key] = item;
+                });
+
+                const getColor = (p) => {
+                    return p >= 100 ? '#22c55e' : // Green
+                        p >= 75 ? '#84cc16' : // Light Green
+                            p >= 50 ? '#eab308' : // Yellow
+                                p >= 25 ? '#f97316' : // Orange
+                                    '#ef4444';   // Red
+                };
+
+                const style = (feature) => {
+                    const kec = feature.properties.district ? feature.properties.district.toUpperCase() : "";
+                    const desa = feature.properties.village ? feature.properties.village.toUpperCase().replace(/\s/g, '') : "";
+                    const key = `${kec}_${desa}`;
+                    const stats = villageStats[key];
+
+                    let p = 0;
+                    if (stats && stats.target > 0) {
+                        p = ((stats.total_kk + stats.bjp_kk) / stats.target * 100);
+                    }
+
+                    return {
+                        fillColor: getColor(p),
+                        weight: 1,
+                        opacity: 1,
+                        color: 'white',
+                        dashArray: '3',
+                        fillOpacity: 0.7
+                    };
+                };
+
+                const highlightFeature = (e) => {
+                    const layer = e.target;
+                    layer.setStyle({
+                        weight: 3,
+                        color: '#000',
+                        dashArray: '',
+                        fillOpacity: 0.9
+                    });
+                    layer.bringToFront();
+                };
+
+                let geojsonLayer;
+
+                zoomMapToFilters = (kec, search) => {
+                    if (!geojsonLayer) return;
+
+                    const bounds = L.latLngBounds();
+                    const isFilterActive = (kec !== "" || search !== "");
+                    let found = false;
+                    const searchNorm = search.toUpperCase().replace(/\s/g, '');
+
+                    geojsonLayer.eachLayer(layer => {
+                        const fKec = layer.feature.properties.district ? layer.feature.properties.district.toUpperCase() : "";
+                        const fDesa = layer.feature.properties.village ? layer.feature.properties.village.toUpperCase().replace(/\s/g, '') : "";
+
+                        const matchKec = kec === "" || fKec === kec;
+                        const matchSearch = searchNorm === "" || fDesa.includes(searchNorm);
+
+                        if (matchKec && matchSearch) {
+                            if (isFilterActive) {
+                                bounds.extend(layer.getBounds());
+                                found = true;
+                            }
+
+                            // Restore standard achievement color
+                            geojsonLayer.resetStyle(layer);
+
+                            if (isFilterActive) {
+                                layer.setStyle({
+                                    weight: 4,
+                                    color: '#000',
+                                    fillOpacity: 1,
+                                    dashArray: ''
+                                });
+                                layer.bringToFront();
+                            }
+                        } else {
+                            if (isFilterActive) {
+                                // "Warna hilang" - grey out
+                                layer.setStyle({
+                                    fillColor: '#e5e7eb',
+                                    fillOpacity: 0.1,
+                                    weight: 0.5,
+                                    color: '#d1d5db',
+                                    dashArray: ''
+                                });
+                            } else {
+                                geojsonLayer.resetStyle(layer);
+                            }
+                        }
+                    });
+
+                    if (found && isFilterActive) {
+                        map.fitBounds(bounds, {
+                            padding: [50, 50],
+                            maxZoom: 15,
+                            animate: true,
+                            duration: 1.0
+                        });
+                    } else if (!isFilterActive) {
+                        map.setView([-6.82, 107.14], 11);
+                    }
+                };
+
+                const resetHighlight = (e) => {
+                    geojsonLayer.resetStyle(e.target);
+                };
+
+                geojsonLayer = L.geoJson(geoData, {
+                    style: style,
+                    onEachFeature: (feature, layer) => {
+                        const kec = feature.properties.district ? feature.properties.district.toUpperCase() : "";
+                        const desa = feature.properties.village ? feature.properties.village.toUpperCase().replace(/\s/g, '') : "";
+                        const key = `${kec}_${desa}`;
+                        const stats = villageStats[key];
+
+                        let popupContent = `<strong>${feature.properties.village || 'N/A'}</strong><br>Desa: ${feature.properties.district || 'N/A'}`;
+
+                        if (stats) {
+                            const p = stats.target > 0 ? ((stats.total_kk + stats.bjp_kk) / stats.target * 100).toFixed(2) : 0;
+                            popupContent += `<br>Target: ${stats.target.toLocaleString()}<br>JP: ${stats.total_kk.toLocaleString()}<br>BJP: ${stats.bjp_kk.toLocaleString()}<br><strong>Capaian: ${p}%</strong>`;
+                        } else {
+                            popupContent += `<br><em>Data tidak ditemukan</em>`;
+                        }
+
+                        layer.bindPopup(popupContent);
+                        layer.on({
+                            mouseover: highlightFeature,
+                            mouseout: resetHighlight
+                        });
+                    }
+                }).addTo(map);
+
+                // Add legend
+                const legend = L.control({ position: 'bottomright' });
+                legend.onAdd = function (map) {
+                    const div = L.DomUtil.create('div', 'info legend');
+                    div.style.background = 'white';
+                    div.style.padding = '10px';
+                    div.style.border = '2px solid black';
+                    div.style.boxShadow = '5px 5px 0px #000';
+                    const grades = [0, 25, 50, 75, 100];
+                    div.innerHTML = '<strong>Capaian %</strong><br>';
+                    for (let i = 0; i < grades.length; i++) {
+                        div.innerHTML +=
+                            '<i style="background:' + getColor(grades[i] + 1) + '; width: 18px; height: 18px; float: left; margin-right: 8px; border: 1px solid #000;"></i> ' +
+                            grades[i] + (grades[i + 1] ? '&ndash;' + grades[i + 1] + '<br>' : '+');
+                    }
+                    return div;
+                };
+                legend.addTo(map);
+
+                // Now that map is ready, apply filters to sync zoom
+                applyFilters();
+
+            } catch (e) {
+                console.error("Map Load Error:", e);
+                mapContainer.innerHTML = `<div style="padding: 2rem; text-align: center;">Gagal memuat peta: ${e.message}</div>`;
+            }
+        };
+
+        // Initialize everything on load
+        window.addEventListener('DOMContentLoaded', () => {
+            applyFilters();
+            initMap();
+        });
     </script>
 </body>
 

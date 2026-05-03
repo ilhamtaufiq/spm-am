@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -15,6 +16,7 @@
             margin: 0;
             overflow: hidden;
         }
+
         .login-card {
             background: var(--white);
             padding: 4rem 3rem;
@@ -26,6 +28,7 @@
             animation: fadeIn 0.8s ease-out;
             position: relative;
         }
+
         .login-card::before {
             content: "AKSES AMAN CUY";
             position: absolute;
@@ -38,10 +41,12 @@
             font-size: 0.8rem;
             border-radius: 5px;
         }
+
         .header {
             text-align: center;
             margin-bottom: 3rem;
         }
+
         .logo-text {
             font-size: 5rem;
             font-weight: 900;
@@ -49,11 +54,30 @@
             margin-bottom: 1rem;
             letter-spacing: -2px;
         }
-        h1 { font-size: 1.8rem; font-weight: 900; margin-bottom: 0.5rem; text-transform: uppercase; }
-        p { font-weight: 600; opacity: 0.7; }
 
-        .form-group { margin-bottom: 2rem; }
-        label { display: block; font-size: 1.1rem; font-weight: 900; margin-bottom: 0.8rem; text-transform: uppercase; }
+        h1 {
+            font-size: 1.8rem;
+            font-weight: 900;
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+        }
+
+        p {
+            font-weight: 600;
+            opacity: 0.7;
+        }
+
+        .form-group {
+            margin-bottom: 2rem;
+        }
+
+        label {
+            display: block;
+            font-size: 1.1rem;
+            font-weight: 900;
+            margin-bottom: 0.8rem;
+            text-transform: uppercase;
+        }
 
         .btn-login {
             width: 100%;
@@ -90,10 +114,11 @@
         }
     </style>
 </head>
+
 <body>
     <div class="login-card">
         <div class="header">
-            <div class="logo-text">AMS<br><span style="color: var(--main-dark);">SUPER</span></div>
+            <div class="logo-text">AMS<br><span style="color: var(--main-dark);">SUPER APP</span></div>
             <h1>KHUSUS ADMIN AJA</h1>
             <p>Halo lagi, masukin ID lu di bawah</p>
         </div>
@@ -105,11 +130,13 @@
         <form action="/login" method="POST">
             <div class="form-group">
                 <label for="username">ID KOMANDAN</label>
-                <input type="text" id="username" name="username" placeholder="Masukan Username" required autofocus class="form-input" style="background: #f8fafc; font-size: 1.2rem; padding: 1.2rem;">
+                <input type="text" id="username" name="username" placeholder="Masukan Username" required autofocus
+                    class="form-input" style="background: #f8fafc; font-size: 1.2rem; padding: 1.2rem;">
             </div>
             <div class="form-group">
                 <label for="password">KODE RAHASIA</label>
-                <input type="password" id="password" name="password" placeholder="••••••••" required class="form-input" style="background: #f8fafc; font-size: 1.2rem; padding: 1.2rem;">
+                <input type="password" id="password" name="password" placeholder="••••••••" required class="form-input"
+                    style="background: #f8fafc; font-size: 1.2rem; padding: 1.2rem;">
             </div>
             <button type="submit" class="btn-login">GAS MASUK!</button>
         </form>
@@ -119,4 +146,5 @@
         </div>
     </div>
 </body>
+
 </html>

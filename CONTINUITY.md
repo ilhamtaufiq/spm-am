@@ -2,40 +2,36 @@
 
 ## Goal (incl. success criteria):
 - Enhance SPM Dashboard with better data integrity, performance, and features.
-- Success: Data deduplicated, schema hardened (FKs, Indexes, Constraints), and SIMSPAM registration tracking implemented.
-- Success: Village names standardized (UPPERCASE, NO SPACES).
+- Success: Global UI components (Header & Footer) implemented with "Super Gokil" design.
+- Success: High-end neobrutalist aesthetics across the entire application.
 
 ## Constraints/Assumptions:
-- Database: SQLite (`data/spm_am.db`).
-- Tech: FastAPI + SQLAlchemy + Vanilla JS.
-- Persona: Casual "gaul" Indonesian.
+- Tech: FastAPI + Jinja2 + Neobrutalist CSS.
+- Design: High contrast, thick borders, layered shadows, abstract patterns.
 
 ## Key decisions:
-- Use `is_simspam` column (Integer 0/1) for simspam.id registration status.
-- Standardize village names to `BABAKANKARET` format for consistent matching.
-- Use a dedicated migration script (`deploy_migration.py`) for schema updates.
+- "Super Gokil" Footer: Dark theme, layered 3D credit box, abstract geometry, and interactive "KIRIM KOPI" button.
+- Global component integration for all pages.
 
 ## State:
 - **Done**:
-    - Bulk update notes feature.
-    - Database hardening (indexes, unique constraints, audit fields).
-    - Restore/Recover data after migration glitch.
-    - Fixed "Add Data" village dropdown API.
-    - Added SIMSPAM column and toggle logic.
-    - Standardized existing data to UPPERCASE_NOSPACES.
-    - **Database Normalization**: Successfully transitioned to relational schema (Kecamatan, Desa, UnitSpam, Pengelola, Achievement).
-    - **Migration**: 32 Kecamatan and 360 Units migrated and verified.
+    - **Database Normalization**: Successfully transitioned to relational schema.
+    - **Dynamic Stats & Map**: All stats and map layers synchronize with filters.
+    - **Global Components**: Implemented `header_component.html` and `footer_component.html`.
+    - **UI Polishing**: Upgraded footer to "Super Gokil" version.
 - **Now**:
-    - Finalizing dashboard stats breakdown (JP vs BJP).
-    - Fixing "Total Jiwa" display logic in `index.html`.
+    - Integrated "Super Gokil" footer across the ecosystem.
 - **Next**:
-    - Final user verification of the entire flow.
+    - Final user verification.
 
 ## Open questions:
-- None for now.
+- None.
 
 ## Working set:
 - `main.py`
-- `models.py`
+- `templates/footer_component.html`
 - `templates/index.html`
-- `scratch/calc_stats.py`
+- `templates/landing.html`
+- `templates/rab.html`
+- `templates/remi_game.html`
+- `templates/remi_list.html`
