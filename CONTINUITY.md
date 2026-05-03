@@ -25,6 +25,7 @@
     - Standardized existing data to UPPERCASE_NOSPACES.
 - **Now**:
     - Validating UI layout and column order.
+    - Dynamic Stats Grid (updates on filter: Kecamatan, Desa, Tahun).
 - **Next**:
     - Final user verification of the entire flow.
 

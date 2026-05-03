@@ -265,7 +265,7 @@
                         style="width: 50px; height: 50px; background: rgba(0,0,0,0.05); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">
                         🏠</div>
                 </div>
-                <span class="value">{{ "{:,}".format(total_sr) }}</span>
+                <span class="value" id="stat-total-sr">{{ "{:,}".format(total_sr) }}</span>
             </div>
             <div class="stat-card">
                 <div style="display: flex; justify-content: space-between; align-items: flex-start;">
@@ -274,7 +274,7 @@
                         style="width: 50px; height: 50px; background: rgba(0,0,0,0.05); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">
                         👨‍👩‍👧</div>
                 </div>
-                <span class="value">{{ "{:,}".format(total_kk) }}</span>
+                <span class="value" id="stat-total-kk">{{ "{:,}".format(total_kk) }}</span>
             </div>
             <div class="stat-card" style="background: #fcd34d;">
                 <div style="display: flex; justify-content: space-between; align-items: flex-start;">
@@ -283,7 +283,7 @@
                         style="width: 50px; height: 50px; background: rgba(0,0,0,0.05); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">
                         👥</div>
                 </div>
-                <span class="value">{{ "{:,}".format(total_kk * 5) }}</span>
+                <span class="value" id="stat-total-jiwa">{{ "{:,}".format(total_kk * 5) }}</span>
             </div>
             <div class="stat-card" style="background: #60a5fa;">
                 <div style="display: flex; justify-content: space-between; align-items: flex-start;">
@@ -292,7 +292,7 @@
                         style="width: 50px; height: 50px; background: rgba(0,0,0,0.05); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">
                         💧</div>
                 </div>
-                <span class="value">{{ "{:,}".format(total_bjp_kk) }}</span>
+                <span class="value" id="stat-total-bjp">{{ "{:,}".format(total_bjp_kk) }}</span>
             </div>
             <div class="stat-card" style="background: #d8b4fe;">
                 <div style="display: flex; justify-content: space-between; align-items: flex-start;">
@@ -301,7 +301,7 @@
                         style="width: 50px; height: 50px; background: rgba(0,0,0,0.05); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">
                         🎯</div>
                 </div>
-                <span class="value">{{ "%.2f"|format(total_combined_percentage) }}%</span>
+                <span class="value" id="stat-goal">{{ "%.2f"|format(total_combined_percentage) }}%</span>
             </div>
         </div>
 
@@ -796,10 +796,44 @@
 
             currentPage = 1;
             renderTable();
+            updateStats();
+        }
+
+        function updateStats() {
+            const selectedYear = document.getElementById('yearFilter').value;
+            let totalSr = 0;
+            let totalKk = 0;
+            let totalBjp = 0;
+            let totalTarget = 0;
+
+            filteredItems.forEach(item => {
+                if (selectedYear === 'All') {
+                    totalSr += item.total_sr || 0;
+                    totalKk += item.total_kk || 0;
+                    totalBjp += item.bjp_kk || 0;
+                } else {
+                    const yearData = item.years_list.find(y => y.tahun == selectedYear);
+                    if (yearData) {
+                        totalSr += yearData.sr || 0;
+                        totalKk += yearData.kk || 0;
+                        totalBjp += yearData.bjp_kk || 0;
+                    }
+                }
+                totalTarget += item.target || 0;
+            });
+
+            const totalJiwa = totalKk * 5;
+            const goal = totalTarget > 0 ? ((totalKk + totalBjp) / totalTarget * 100) : 0;
+
+            document.getElementById('stat-total-sr').innerText = totalSr.toLocaleString();
+            document.getElementById('stat-total-kk').innerText = totalKk.toLocaleString();
+            document.getElementById('stat-total-jiwa').innerText = totalJiwa.toLocaleString();
+            document.getElementById('stat-total-bjp').innerText = totalBjp.toLocaleString();
+            document.getElementById('stat-goal').innerText = goal.toFixed(2) + '%';
         }
 
         // Initial render
-        renderTable();
+        applyFilters();
 
         function openDetail(item) {
             document.getElementById('detailTitle').innerText = 'Breakdown: Desa ' + item.desa;
