@@ -26,8 +26,8 @@
     - **Database Normalization**: Successfully transitioned to relational schema (Kecamatan, Desa, UnitSpam, Pengelola, Achievement).
     - **Migration**: 32 Kecamatan and 360 Units migrated and verified.
 - **Now**:
-    - Final validation of UI layout and column order with normalized data.
-    - Verifying annual breakdown modal functionality.
+    - Finalizing dashboard stats breakdown (JP vs BJP).
+    - Fixing "Total Jiwa" display logic in `index.html`.
 - **Next**:
     - Final user verification of the entire flow.
 
@@ -38,4 +38,4 @@
 - `main.py`
 - `models.py`
 - `templates/index.html`
-- `deploy_migration.py` (New deployment tool)
+- `scratch/calc_stats.py`

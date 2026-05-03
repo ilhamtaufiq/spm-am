@@ -275,6 +275,7 @@
                         👨‍👩‍👧</div>
                 </div>
                 <span class="value" id="stat-total-kk">{{ "{:,}".format(total_kk) }}</span>
+                <span class="label" style="font-size: 0.7rem; opacity: 0.8;">Kontribusi: {{ "%.2f"|format(total_kk / total_target * 100) if total_target > 0 else 0 }}%</span>
             </div>
             <div class="stat-card" style="background: #fcd34d;">
                 <div style="display: flex; justify-content: space-between; align-items: flex-start;">
@@ -283,7 +284,7 @@
                         style="width: 50px; height: 50px; background: rgba(0,0,0,0.05); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem;">
                         👥</div>
                 </div>
-                <span class="value" id="stat-total-jiwa">{{ "{:,}".format(total_kk * 5) }}</span>
+                <span class="value" id="stat-total-jiwa">{{ "{:,}".format((total_kk + total_bjp_kk) * 5) }}</span>
             </div>
             <div class="stat-card" style="background: #60a5fa;">
                 <div style="display: flex; justify-content: space-between; align-items: flex-start;">
@@ -293,6 +294,7 @@
                         💧</div>
                 </div>
                 <span class="value" id="stat-total-bjp">{{ "{:,}".format(total_bjp_kk) }}</span>
+                <span class="label" style="font-size: 0.7rem; opacity: 0.8;">Kontribusi: {{ "%.2f"|format(total_bjp_kk / total_target * 100) if total_target > 0 else 0 }}%</span>
             </div>
             <div class="stat-card" style="background: #d8b4fe;">
                 <div style="display: flex; justify-content: space-between; align-items: flex-start;">
@@ -603,6 +605,11 @@
             </form>
         </div>
     </div>
+    
+    <!-- JSON Data for JavaScript -->
+    <script id="items-data" type="application/json">
+        {{ items| tojson | safe }}
+    </script>
 
     <script>
 
@@ -626,7 +633,7 @@
         }
 
         // Pagination Logic
-        const allItems = {{ items| tojson | safe }};
+        const allItems = JSON.parse(document.getElementById('items-data').textContent);
         let filteredItems = [...allItems];
         let currentPage = 1;
         const pageSize = 20;
