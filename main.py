@@ -88,79 +88,81 @@ async def read_root(request: Request, db: Session = Depends(get_db)):
     if not get_current_user(request):
         return RedirectResponse(url="/login")
     
-    bjp_map = load_bjp_data()
-    items_raw = db.query(Achievement).all()
-    grouped = {}
-    for item in items_raw:
-        key = (item.kecamatan.upper(), item.desa.upper().replace(' ', ''))
-        if key not in grouped:
-            # Use DB value if exists and not zero, otherwise fallback to .md file
-            bjp_kk = item.jumlah_bjp_kk if (item.jumlah_bjp_kk and item.jumlah_bjp_kk > 0) else bjp_map.get(key, 0)
-            grouped[key] = {
-                "kecamatan": item.kecamatan, 
-                "desa": item.desa, 
-                "is_simspam": item.is_simspam,
-                "target": item.target, 
-                "total_sr": 0, "total_kk": 0, 
-                "total_bjp_kk": 0, # We'll sum this up
-                "years_list": []
-            }
+    # Query UnitSpam and join Desa, Kecamatan, Pengelola
+    units = db.query(models.UnitSpam).join(models.Desa).join(models.Kecamatan).all()
+    
+    bjp_file_map = load_bjp_data()
+    
+    display_items = []
+    for u in units:
+        # Sum annual achievements
+        total_sr = sum(a.jumlah_sr or 0 for a in u.achievements)
+        total_kk = sum(a.jumlah_kk or 0 for a in u.achievements)
         
-        # Fallback logic for BJP in each year row
-        bjp_kk_row = item.jumlah_bjp_kk if (item.jumlah_bjp_kk and item.jumlah_bjp_kk > 0) else bjp_map.get(key, 0)
+        # BJP from file (master) + BJP from achievements (new)
+        file_bjp = bjp_file_map.get((u.desa.kecamatan.name, u.desa.name), 0)
+        total_bjp_kk = file_bjp + sum(a.jumlah_bjp_kk or 0 for a in u.achievements)
         
-        grouped[key]["total_sr"] += (item.jumlah_sr or 0)
-        grouped[key]["total_kk"] += (item.jumlah_kk or 0)
-        grouped[key]["total_bjp_kk"] += (item.jumlah_bjp_kk or 0) # Real sum from DB
-        grouped[key]["years_list"].append({
-            "id": item.id, "tahun": item.tahun, 
-            "sr": item.jumlah_sr or 0, "kk": item.jumlah_kk or 0, "jiwa": item.jumlah_jiwa or 0,
-            "bjp_kk": bjp_kk_row, "bjp_jiwa": (bjp_kk_row * 5),
-            "meta": {
-                "sumber_dana": item.sumber_dana, "program": item.program,
-                "sistem_layanan": item.sistem_layanan, "kepala": item.kepala,
-                "iuran_nominal": item.iuran_nominal, "biaya_operasional": item.biaya_operasional,
-                "pokmas": item.pokmas, "perdes": item.perdes,
-                "bendahara": item.bendahara, "sekretaris": item.sekretaris,
-                "sumber_mata_air_kap": item.sumber_mata_air_kap,
-                "sumber_air_tanah_kap": item.sumber_air_tanah_kap,
-                "lain_lain_kap": item.lain_lain_kap,
-                "tarif_dasar_hukum": item.tarif_dasar_hukum,
-                "catatan": item.catatan
-            }
+        # Sort years descending
+        years_list = sorted([
+            {
+                "id": a.id, "tahun": a.tahun,
+                "sr": a.jumlah_sr or 0, "kk": a.jumlah_kk or 0, "jiwa": a.jumlah_jiwa or 0,
+                "bjp_kk": a.jumlah_bjp_kk or 0, "bjp_jiwa": a.jumlah_bjp_jiwa or 0,
+                "meta": {
+                    "sumber_dana": u.sumber_dana, "program": u.program,
+                    "sistem_layanan": u.sistem_layanan, "kepala": u.pengelola.kepala if u.pengelola else "",
+                    "iuran_nominal": u.iuran_nominal, "biaya_operasional": u.biaya_operasional,
+                    "pokmas": u.pengelola.pokmas if u.pengelola else "", 
+                    "perdes": u.pengelola.perdes if u.pengelola else "",
+                    "bendahara": u.pengelola.bendahara if u.pengelola else "", 
+                    "sekretaris": u.pengelola.sekretaris if u.pengelola else "",
+                    "sumber_mata_air_kap": u.sumber_mata_air_kap,
+                    "sumber_air_tanah_kap": u.sumber_air_tanah_kap,
+                    "lain_lain_kap": u.lain_lain_kap,
+                    "tarif_dasar_hukum": u.tarif_dasar_hukum,
+                    "catatan": a.catatan
+                }
+            } for a in u.achievements
+        ], key=lambda x: x["tahun"], reverse=True)
+        
+        display_items.append({
+            "unit_id": u.id,
+            "kecamatan": u.desa.kecamatan.name,
+            "desa": u.desa.name,
+            "is_simspam": u.is_simspam,
+            "target": u.desa.target,
+            "total_sr": total_sr,
+            "total_kk": total_kk,
+            "bjp_kk": total_bjp_kk,
+            "bjp_jiwa": total_bjp_kk * 5,
+            "years_list": years_list
         })
-        
-    for key, data in grouped.items():
-        # If total_bjp_kk is still 0 across all years, use the .md fallback for the summary
-        if data["total_bjp_kk"] == 0:
-            data["bjp_kk"] = bjp_map.get(key, 0)
-        else:
-            data["bjp_kk"] = data["total_bjp_kk"]
-        data["bjp_jiwa"] = data["bjp_kk"] * 5
 
-    display_items = sorted(grouped.values(), key=lambda x: (x["kecamatan"], x["desa"]))
+    display_items = sorted(display_items, key=lambda x: (x["kecamatan"], x["desa"]))
     
-    # Calculate Totals
-    total_sr = sum(item["total_sr"] for item in display_items)
-    total_kk = sum(item["total_kk"] for item in display_items)
-    total_bjp_kk = sum(item["bjp_kk"] for item in display_items)
-    total_target = sum(item["target"] for item in display_items)
+    # Calculate Grand Totals
+    grand_total_sr = sum(item["total_sr"] for item in display_items)
+    grand_total_kk = sum(item["total_kk"] for item in display_items)
+    # Total BJP is sum of all file-based BJP + sum of all achievement-based BJP
+    total_bjp_file = sum(bjp_file_map.values())
+    total_bjp_db = db.query(func.sum(models.Achievement.jumlah_bjp_kk)).scalar() or 0
+    grand_total_bjp_kk = total_bjp_file + total_bjp_db
     
-    total_percentage = (total_kk / total_target * 100) if total_target > 0 else 0
-    total_bjp_percentage = (total_bjp_kk / total_target * 100) if total_target > 0 else 0
-    total_combined_percentage = ((total_kk + total_bjp_kk) / total_target * 100) if total_target > 0 else 0
+    # Target should be sum of ALL villages in the kabupaten
+    grand_total_target = db.query(func.sum(models.Desa.target)).scalar() or 0
     
-    kecamatan_list = sorted(list(set([item.kecamatan for item in items_raw])))
-    available_years = sorted(list(set([str(item.tahun) for item in items_raw])), reverse=True)
+    total_combined_percentage = ((grand_total_kk + grand_total_bjp_kk) / grand_total_target * 100) if grand_total_target > 0 else 0
+    
+    kecamatan_list = sorted([k.name for k in db.query(models.Kecamatan).all()])
+    available_years = sorted(list(set([str(a.tahun) for a in db.query(models.Achievement).all()])), reverse=True)
         
     return templates.TemplateResponse(request=request, name="index.html", context={
         "items": display_items, 
-        "total_sr": total_sr, 
-        "total_kk": total_kk, 
-        "total_bjp_kk": total_bjp_kk,
-        "total_target": total_target,
-        "total_percentage": total_percentage, 
-        "total_bjp_percentage": total_bjp_percentage,
+        "total_sr": grand_total_sr, 
+        "total_kk": grand_total_kk, 
+        "total_bjp_kk": grand_total_bjp_kk,
+        "total_target": grand_total_target,
         "total_combined_percentage": total_combined_percentage,
         "kecamatan_list": kecamatan_list, 
         "available_years": available_years
@@ -194,25 +196,82 @@ async def add_data(
 ):
     if not get_current_user(request): return RedirectResponse(url="/login", status_code=302)
     
-    # Normalize
-    kecamatan = kecamatan.upper()
-    desa = desa.upper().replace(" ", "")
+    # Normalize inputs
+    kec_name = kecamatan.upper()
+    desa_name = desa.upper().replace(" ", "")
     
-    existing = db.query(Achievement).filter(Achievement.desa == desa).first()
-    target = existing.target if existing else 0
-    new_item = Achievement(
-        kecamatan=kecamatan, desa=desa, tahun=tahun, 
-        jumlah_sr=jumlah_sr, jumlah_kk=jumlah_kk, jumlah_jiwa=jumlah_kk*5, 
-        jumlah_bjp_kk=jumlah_bjp_kk, jumlah_bjp_jiwa=jumlah_bjp_kk*5,
-        target=target, pokmas=pokmas, perdes=perdes, kepala=kepala,
-        bendahara=bendahara, sekretaris=sekretaris,
-        sumber_mata_air_kap=sumber_mata_air_kap, sistem_layanan=sistem_layanan,
-        sumber_air_tanah_kap=sumber_air_tanah_kap, lain_lain_kap=lain_lain_kap,
-        tarif_dasar_hukum=tarif_dasar_hukum, iuran_nominal=iuran_nominal,
-        biaya_operasional=biaya_operasional, sumber_dana=sumber_dana,
-        program=program, catatan=catatan
-    )
-    db.add(new_item)
+    # 1. Get/Create Kecamatan
+    kec = db.query(models.Kecamatan).filter(models.Kecamatan.name == kec_name).first()
+    if not kec:
+        kec = models.Kecamatan(name=kec_name)
+        db.add(kec)
+        db.flush()
+        
+    # 2. Get/Create Desa
+    d_obj = db.query(models.Desa).filter(models.Desa.kecamatan_id == kec.id, models.Desa.name == desa_name).first()
+    if not d_obj:
+        d_obj = models.Desa(kecamatan_id=kec.id, name=desa_name, target=0)
+        db.add(d_obj)
+        db.flush()
+        
+    # 3. Get/Create UnitSpam (Assuming 1 per village for now)
+    unit = db.query(models.UnitSpam).filter(models.UnitSpam.desa_id == d_obj.id).first()
+    if not unit:
+        unit = models.UnitSpam(
+            desa_id=d_obj.id,
+            sistem_layanan=sistem_layanan,
+            sumber_mata_air_kap=sumber_mata_air_kap,
+            sumber_air_tanah_kap=sumber_air_tanah_kap,
+            lain_lain_kap=lain_lain_kap,
+            sumber_dana=sumber_dana,
+            program=program,
+            tarif_dasar_hukum=tarif_dasar_hukum,
+            iuran_nominal=iuran_nominal,
+            biaya_operasional=biaya_operasional
+        )
+        db.add(unit)
+        db.flush()
+    else:
+        # Update technical data if provided
+        if sistem_layanan: unit.sistem_layanan = sistem_layanan
+        # ... update other fields as needed
+        
+    # 4. Get/Create Pengelola
+    if not unit.pengelola:
+        pengelola = models.Pengelola(
+            unit_spam_id=unit.id,
+            pokmas=pokmas, perdes=perdes, kepala=kepala,
+            bendahara=bendahara, sekretaris=sekretaris
+        )
+        db.add(pengelola)
+    else:
+        if pokmas: unit.pengelola.pokmas = pokmas
+        if kepala: unit.pengelola.kepala = kepala
+        # ...
+        
+    # 5. Create Achievement (Annual)
+    # Check if exists for that year
+    existing_ach = db.query(models.Achievement).filter(models.Achievement.unit_spam_id == unit.id, models.Achievement.tahun == tahun).first()
+    if existing_ach:
+        existing_ach.jumlah_sr = jumlah_sr
+        existing_ach.jumlah_kk = jumlah_kk
+        existing_ach.jumlah_jiwa = jumlah_kk * 5
+        existing_ach.jumlah_bjp_kk = jumlah_bjp_kk
+        existing_ach.jumlah_bjp_jiwa = jumlah_bjp_kk * 5
+        existing_ach.catatan = catatan
+    else:
+        new_ach = models.Achievement(
+            unit_spam_id=unit.id,
+            tahun=tahun,
+            jumlah_sr=jumlah_sr,
+            jumlah_kk=jumlah_kk,
+            jumlah_jiwa=jumlah_kk * 5,
+            jumlah_bjp_kk=jumlah_bjp_kk,
+            jumlah_bjp_jiwa=jumlah_bjp_kk * 5,
+            catatan=catatan
+        )
+        db.add(new_ach)
+        
     db.commit()
     
     if request.headers.get("X-Requested-With") == "XMLHttpRequest":
@@ -223,7 +282,7 @@ async def add_data(
 @app.post("/update/{item_id}")
 async def update_item(
     request: Request, 
-    item_id: int, 
+    item_id: int, # This is the Achievement ID
     jumlah_sr: int = Form(...), 
     jumlah_kk: int = Form(...), 
     jumlah_bjp_kk: int = Form(0), 
@@ -245,28 +304,45 @@ async def update_item(
     db: Session = Depends(get_db)
 ):
     if not get_current_user(request): return RedirectResponse(url="/login", status_code=302)
-    item = db.query(Achievement).filter(Achievement.id == item_id).first()
-    if item:
-        item.jumlah_sr = jumlah_sr
-        item.jumlah_kk = jumlah_kk
-        item.jumlah_jiwa = jumlah_kk * 5
-        item.jumlah_bjp_kk = jumlah_bjp_kk
-        item.jumlah_bjp_jiwa = jumlah_bjp_kk * 5
-        item.pokmas = pokmas
-        item.perdes = perdes
-        item.kepala = kepala
-        item.bendahara = bendahara
-        item.sekretaris = sekretaris
-        item.sumber_mata_air_kap = sumber_mata_air_kap
-        item.sistem_layanan = sistem_layanan
-        item.sumber_air_tanah_kap = sumber_air_tanah_kap
-        item.lain_lain_kap = lain_lain_kap
-        item.tarif_dasar_hukum = tarif_dasar_hukum
-        item.iuran_nominal = iuran_nominal
-        item.biaya_operasional = biaya_operasional
-        item.sumber_dana = sumber_dana
-        item.program = program
-        item.catatan = catatan
+    
+    ach = db.query(models.Achievement).filter(models.Achievement.id == item_id).first()
+    if ach:
+        # Update annual data
+        ach.jumlah_sr = jumlah_sr
+        ach.jumlah_kk = jumlah_kk
+        ach.jumlah_jiwa = jumlah_kk * 5
+        ach.jumlah_bjp_kk = jumlah_bjp_kk
+        ach.jumlah_bjp_jiwa = jumlah_bjp_kk * 5
+        ach.catatan = catatan
+        
+        # Update UnitSpam data (Technical/Financial)
+        unit = ach.unit
+        if unit:
+            unit.sistem_layanan = sistem_layanan
+            unit.sumber_mata_air_kap = sumber_mata_air_kap
+            unit.sumber_air_tanah_kap = sumber_air_tanah_kap
+            unit.lain_lain_kap = lain_lain_kap
+            unit.tarif_dasar_hukum = tarif_dasar_hukum
+            unit.iuran_nominal = iuran_nominal
+            unit.biaya_operasional = biaya_operasional
+            if sumber_dana: unit.sumber_dana = sumber_dana
+            if program: unit.program = program
+            
+            # Update Pengelola
+            if unit.pengelola:
+                unit.pengelola.pokmas = pokmas
+                unit.pengelola.perdes = perdes
+                unit.pengelola.kepala = kepala
+                unit.pengelola.bendahara = bendahara
+                unit.pengelola.sekretaris = sekretaris
+            else:
+                new_peng = models.Pengelola(
+                    unit_spam_id=unit.id,
+                    pokmas=pokmas, perdes=perdes, kepala=kepala,
+                    bendahara=bendahara, sekretaris=sekretaris
+                )
+                db.add(new_peng)
+                
         db.commit()
         
     if request.headers.get("X-Requested-With") == "XMLHttpRequest":
@@ -437,10 +513,6 @@ async def remi_update_round(request: Request, game_id: int, db: Session = Depend
                     p_b.total_score = 0
                     
                     # We add another history entry for the reset event
-                    # We can use a decimal round number or just the same round number
-                    reset_entry = RemiRound(game_id=game_id, player_id=p_b.id, points=reset_points, round_number=current_round)
-                    db.add(reset_entry)
-    
     # 4. Cek Win Condition
     for player in players:
         if player.total_score >= 1000:
@@ -451,9 +523,6 @@ async def remi_update_round(request: Request, game_id: int, db: Session = Depend
     db.commit()
     return RedirectResponse(url=f"/remi/{game_id}", status_code=303)
 
-
-
-
 @app.post("/api/bulk-update-catatan")
 async def bulk_update_catatan(
     request: Request,
@@ -463,116 +532,100 @@ async def bulk_update_catatan(
         return {"status": "error", "message": "Unauthorized"}
     
     data = await request.json()
-    items = data.get("items", []) # List of {kecamatan, desa}
+    items = data.get("items", []) 
     new_note = data.get("catatan", "")
     target_year = data.get("year", "All")
     
     if not items:
         return {"status": "error", "message": "No data selected"}
         
-    from models import Achievement
     for it in items:
-        kec = it.get("kecamatan")
-        desa = it.get("desa")
+        kec_name = it.get("kecamatan")
+        desa_name = it.get("desa")
+        
+        unit = db.query(models.UnitSpam).join(models.Desa).join(models.Kecamatan)\
+            .filter(models.Kecamatan.name == kec_name, models.Desa.name == desa_name).first()
+            
+        if not unit: continue
         
         if target_year != "All":
-            db.query(Achievement).filter(
-                Achievement.kecamatan == kec,
-                Achievement.desa == desa,
-                Achievement.tahun == target_year
+            db.query(models.Achievement).filter(
+                models.Achievement.unit_spam_id == unit.id,
+                models.Achievement.tahun == target_year
             ).update({"catatan": new_note}, synchronize_session=False)
         else:
-            # Update latest record for each village in that kecamatan
-            latest = db.query(Achievement).filter(
-                Achievement.kecamatan == kec,
-                Achievement.desa == desa
-            ).order_by(Achievement.tahun.desc()).first()
+            latest = db.query(models.Achievement).filter(
+                models.Achievement.unit_spam_id == unit.id
+            ).order_by(models.Achievement.tahun.desc()).first()
             if latest:
                 latest.catatan = new_note
                 
     db.commit()
     return {"status": "success", "message": f"Berhasil update {len(items)} data."}
 
-
 @app.get("/api/desa/{kec}")
 async def get_villages_by_kec(kec: str, db: Session = Depends(get_db)):
-    from models import Achievement
-    villages = db.query(Achievement.desa).filter(Achievement.kecamatan == kec).distinct().all()
+    villages = db.query(models.Desa.name).join(models.Kecamatan)\
+        .filter(models.Kecamatan.name == kec).all()
     return sorted([v[0] for v in villages])
-
 
 @app.post("/api/update-simspam")
 async def update_simspam(request: Request, db: Session = Depends(get_db)):
     if not get_current_user(request): 
         return {"status": "error", "message": "Unauthorized"}
     data = await request.json()
-    kecamatan = data.get("kecamatan")
+    kecamatan_name = data.get("kecamatan")
     village_name = data.get("village")
     is_checked = data.get("checked")
     
-    from models import Achievement
-    # Update all records for this SPECIFIC village in this SPECIFIC kecamatan
-    db.query(Achievement).filter(
-        Achievement.kecamatan == kecamatan,
-        Achievement.desa == village_name
-    ).update({"is_simspam": 1 if is_checked else 0}, synchronize_session=False)
-    db.commit()
+    unit = db.query(models.UnitSpam).join(models.Desa).join(models.Kecamatan)\
+        .filter(models.Kecamatan.name == kecamatan_name, models.Desa.name == village_name).first()
+        
+    if unit:
+        unit.is_simspam = 1 if is_checked else 0
+        db.commit()
+        
     return {"status": "success"}
-
-
-
 
 @app.get("/api/data")
 async def get_all_data(request: Request, db: Session = Depends(get_db)):
     if not get_current_user(request): return {"status": "error", "message": "Unauthorized"}
     
-    bjp_map = load_bjp_data()
-    items_raw = db.query(Achievement).all()
-    grouped = {}
-    for item in items_raw:
-        key = (item.kecamatan.upper(), item.desa.upper().replace(' ', ''))
-        if key not in grouped:
-            bjp_kk = item.jumlah_bjp_kk if (item.jumlah_bjp_kk and item.jumlah_bjp_kk > 0) else bjp_map.get(key, 0)
-            grouped[key] = {
-                "kecamatan": item.kecamatan, 
-                "desa": item.desa, 
-                "is_simspam": item.is_simspam,
-                "target": item.target, 
-                "total_sr": 0, "total_kk": 0, 
-                "total_bjp_kk": 0, 
-                "years_list": []
-            }
+    bjp_file_map = load_bjp_data()
+    units = db.query(models.UnitSpam).all()
+    display_items = []
+    for u in units:
+        total_sr = sum(a.jumlah_sr or 0 for a in u.achievements)
+        total_kk = sum(a.jumlah_kk or 0 for a in u.achievements)
         
-        bjp_kk_row = item.jumlah_bjp_kk if (item.jumlah_bjp_kk and item.jumlah_bjp_kk > 0) else bjp_map.get(key, 0)
-        grouped[key]["total_sr"] += (item.jumlah_sr or 0)
-        grouped[key]["total_kk"] += (item.jumlah_kk or 0)
-        grouped[key]["total_bjp_kk"] += (item.jumlah_bjp_kk or 0)
-        grouped[key]["years_list"].append({
-            "id": item.id, "tahun": item.tahun, 
-            "sr": item.jumlah_sr or 0, "kk": item.jumlah_kk or 0, "jiwa": item.jumlah_jiwa or 0,
-            "bjp_kk": bjp_kk_row, "bjp_jiwa": (bjp_kk_row * 5),
-            "meta": {
-                "sumber_dana": item.sumber_dana, "program": item.program,
-                "sistem_layanan": item.sistem_layanan, "kepala": item.kepala,
-                "iuran_nominal": item.iuran_nominal, "biaya_operasional": item.biaya_operasional,
-                "pokmas": item.pokmas, "perdes": item.perdes,
-                "bendahara": item.bendahara, "sekretaris": item.sekretaris,
-                "sumber_mata_air_kap": item.sumber_mata_air_kap,
-                "sumber_air_tanah_kap": item.sumber_air_tanah_kap,
-                "lain_lain_kap": item.lain_lain_kap,
-                "tarif_dasar_hukum": item.tarif_dasar_hukum,
-                "catatan": item.catatan
-            }
+        file_bjp = bjp_file_map.get((u.desa.kecamatan.name, u.desa.name), 0)
+        total_bjp_kk = file_bjp + sum(a.jumlah_bjp_kk or 0 for a in u.achievements)
+        
+        years_list = sorted([
+            {
+                "id": a.id, "tahun": a.tahun,
+                "sr": a.jumlah_sr or 0, "kk": a.jumlah_kk or 0, "jiwa": a.jumlah_jiwa or 0,
+                "bjp_kk": a.jumlah_bjp_kk or 0, "bjp_jiwa": a.jumlah_bjp_kk * 5,
+                "meta": {
+                    "sumber_dana": u.sumber_dana, "program": u.program,
+                    "catatan": a.catatan
+                }
+            } for a in u.achievements
+        ], key=lambda x: x["tahun"], reverse=True)
+        
+        display_items.append({
+            "unit_id": u.id,
+            "kecamatan": u.desa.kecamatan.name,
+            "desa": u.desa.name,
+            "is_simspam": u.is_simspam,
+            "target": u.desa.target,
+            "total_sr": total_sr,
+            "total_kk": total_kk,
+            "bjp_kk": total_bjp_kk,
+            "years_list": years_list
         })
         
-    for key, data in grouped.items():
-        if data["total_bjp_kk"] == 0:
-            data["bjp_kk"] = bjp_map.get(key, 0)
-        else:
-            data["bjp_kk"] = data["total_bjp_kk"]
-        data["bjp_jiwa"] = data["bjp_kk"] * 5
-
-    display_items = sorted(grouped.values(), key=lambda x: (x["kecamatan"], x["desa"]))
+    display_items = sorted(display_items, key=lambda x: (x["kecamatan"], x["desa"]))
     return {"status": "success", "items": display_items}
 
 

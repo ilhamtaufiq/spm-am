@@ -23,9 +23,11 @@
     - Fixed "Add Data" village dropdown API.
     - Added SIMSPAM column and toggle logic.
     - Standardized existing data to UPPERCASE_NOSPACES.
+    - **Database Normalization**: Successfully transitioned to relational schema (Kecamatan, Desa, UnitSpam, Pengelola, Achievement).
+    - **Migration**: 32 Kecamatan and 360 Units migrated and verified.
 - **Now**:
-    - Validating UI layout and column order.
-    - Dynamic Stats Grid (updates on filter: Kecamatan, Desa, Tahun).
+    - Final validation of UI layout and column order with normalized data.
+    - Verifying annual breakdown modal functionality.
 - **Next**:
     - Final user verification of the entire flow.
 

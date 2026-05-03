@@ -643,6 +643,7 @@
             pageItems.forEach(item => {
                 let sr = item.total_sr;
                 let kk = item.total_kk;
+                let bjp_kk = item.bjp_kk || 0;
 
                 // If specific year selected, recalculate for that year only
                 if (selectedYear !== 'All') {
@@ -650,17 +651,17 @@
                     if (yearData) {
                         sr = yearData.sr;
                         kk = yearData.kk;
+                        bjp_kk = yearData.bjp_kk || 0;
                     } else {
                         sr = 0;
                         kk = 0;
+                        bjp_kk = 0;
                     }
                 }
 
                 const rowPct = item.target > 0 ? (kk / item.target * 100) : 0;
                 const statusCls = rowPct < 30 ? "status-low" : (rowPct < 75 ? "status-med" : "status-high");
 
-                const bjp_kk = item.bjp_kk || 0;
-                const bjp_jiwa = item.bjp_jiwa || 0;
                 const bjp_pct = item.target > 0 ? (bjp_kk / item.target * 100) : 0;
                 const bjpCls = bjp_pct < 10 ? "status-low" : (bjp_pct < 30 ? "status-med" : "status-high");
 
