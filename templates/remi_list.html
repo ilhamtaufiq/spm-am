@@ -116,7 +116,7 @@
                     <tbody>
                         {% for game in games %}
                         <tr>
-                            <td style="font-weight: 600;">{{ game.created_at }}</td>
+                            <td style="font-weight: 600;">{{ game.created_at.strftime('%Y-%m-%d %H:%M') if game.created_at else '-' }}</td>
                             <td style="font-weight: 800;">#{{ game.id }}</td>
                             <td>
                                 {% if game.is_active %}

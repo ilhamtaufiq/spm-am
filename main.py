@@ -415,7 +415,7 @@ async def remi_delete_game(request: Request, game_id: int, db: Session = Depends
 @app.post("/remi/new")
 async def remi_new(request: Request, p1: str = Form(...), p2: str = Form(...), p3: str = Form(...), p4: str = Form(...), db: Session = Depends(get_db)):
     if not get_current_user(request): return RedirectResponse(url="/login")
-    new_game = RemiGame(created_at=datetime.now().strftime("%Y-%m-%d %H:%M"))
+    new_game = RemiGame()
     db.add(new_game)
     db.commit()
     db.refresh(new_game)

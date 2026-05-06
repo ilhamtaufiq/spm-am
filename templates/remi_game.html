@@ -105,7 +105,7 @@
 <body>
     <div class="container">
         {% set title = "ARENA<br>TEMPUR" %}
-        {% set subtitle = "Mulai: " ~ game.created_at ~ " <br>Target: 1000 Poin" %}
+        {% set subtitle = "Mulai: " ~ (game.created_at.strftime('%Y-%m-%d %H:%M') if game.created_at else '-') ~ " <br>Target: 1000 Poin" %}
         {% set badge1 = "LAGI MAIN BOS" %}
         {% set badge2 = "ID: #" ~ game.id %}
         {% set show_back = true %}
