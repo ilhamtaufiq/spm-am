@@ -19,7 +19,9 @@
     - **Dynamic Stats & Map**: All stats and map layers synchronize with filters.
     - **Global Components**: Implemented `header_component.html` and `footer_component.html`.
     - **UI Polishing**: Upgraded footer to "Super Gokil" version.
-    - **Remi Game Fix**: Resolved "Internal Server Error" when starting a new game by fixing type mismatch in `created_at` column.
+    - **Remi Game Stability**: 
+        - Fixed "Internal Server Error" (DateTime type mismatch) in game creation.
+        - Resolved 422 Unprocessable Entity error by reordering routes to handle "new" path parameter conflict.
 - **Now**:
     - Finalizing Remi Game stability.
 - **Next**:

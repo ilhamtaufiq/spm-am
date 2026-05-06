@@ -401,6 +401,26 @@ async def remi_list(request: Request, db: Session = Depends(get_db)):
         "top_winners": top_winners
     })
 
+
+
+
+
+
+
+@app.post("/remi/new")
+async def remi_new(request: Request, p1: str = Form(...), p2: str = Form(...), p3: str = Form(...), p4: str = Form(...), db: Session = Depends(get_db)):
+    if not get_current_user(request): return RedirectResponse(url="/login")
+    new_game = RemiGame()
+    db.add(new_game)
+    db.commit()
+    db.refresh(new_game)
+    
+    for name in [p1, p2, p3, p4]:
+        player = RemiPlayer(game_id=new_game.id, name=name, total_score=0)
+        db.add(player)
+    db.commit()
+    return RedirectResponse(url=f"/remi/{new_game.id}", status_code=303)
+
 @app.post("/remi/{game_id}/delete")
 async def remi_delete_game(request: Request, game_id: int, db: Session = Depends(get_db)):
     if not get_current_user(request): return RedirectResponse(url="/login")
@@ -425,6 +445,10 @@ async def remi_new(request: Request, p1: str = Form(...), p2: str = Form(...), p
         db.add(player)
     db.commit()
     return RedirectResponse(url=f"/remi/{new_game.id}", status_code=303)
+
+@app.get("/remi/new")
+async def remi_new_get(request: Request):
+    return RedirectResponse(url="/remi")
 
 @app.get("/remi/{game_id}", response_class=HTMLResponse)
 async def remi_dashboard(request: Request, game_id: int, db: Session = Depends(get_db)):
